@@ -16,7 +16,7 @@
 
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
     <label for="inputUsername">Username</label>
-    <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" required autofocus>
+    <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" required autofocus><br>
     <label for="inputPassword">Password</label>
     <input type="password" name="password" id="inputPassword" class="form-control" required>
 
@@ -40,3 +40,13 @@
     </button>
 </form>
 {% endblock %}
+
+{% block javascripts%}
+    {{  encore_entry_script_tags('app') }}
+
+{%  endblock %}
+
+{% block stylesheets%}
+{{  encore_entry_link_tags('app') }}
+{% endblock %}
+
