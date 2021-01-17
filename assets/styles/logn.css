@@ -5,7 +5,10 @@
 @import '~@fortawesome/fontawesome-free/css/brands';
 
 
-body {
-    background-color: lightgray;
+.border {
+    border-width: 10px !important;
 }
 
+.container {
+    padding-top: 10% !important;
+}

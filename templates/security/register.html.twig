@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{%  block stylesheets %}
+    {{ encore_entry_link_tags('register') }}
+{% endblock %}
+
+
+{%  block body %}
+    {% if error %}
+        <div><p>{{ error }}</p></div>
+    {% endif %}
+
+    {{  form_start(registrationForm) }}
+
+
+    {{ form_widget(registrationForm) }}
+    <button class="btn btn-lg btn-primary" type="submit">
+        Sign Up
+    </button>
+    {{ form_end(registrationForm) }}
+
+
+{% endblock %}
