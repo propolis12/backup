@@ -8,11 +8,16 @@
 
 
 {%  block body %}
+
+    <div class="container pt-2 ">
+        <div class="row">
+            <div class=" col-md-4 offset-md-4 border rounded">
     {% if error %}
         <div><p>{{ error }}</p></div>
     {% endif %}
 
     {{  form_start(registrationForm) }}
+                <h1 class="h3 mb-3 font-weight-normal">Please sign up</h1>
 
 
     {{ form_widget(registrationForm) }}
@@ -20,6 +25,13 @@
         Sign Up
     </button>
     {{ form_end(registrationForm) }}
+                <div class="sign in">
+                    <p class="text-right"><a  href="{{ path( 'app_login' ) }}">or Sign in</a></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
 
 
 {% endblock %}

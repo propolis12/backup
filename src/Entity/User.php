@@ -4,10 +4,16 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(
+ *      fields={"username"},
+ *      message="This username is already registered!"
+ *     )
  */
 class User implements UserInterface
 {
@@ -19,7 +25,10 @@ class User implements UserInterface
     private $id;
 
     /**
+     *
+     *
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\NotBlank(message="Please enter the username")
      */
     private $username;
 
@@ -53,6 +62,11 @@ class User implements UserInterface
      * @ORM\Column(type="datetime")
      */
     private $registeredAt;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $agreedTermsAt;
 
     public function getId(): ?int
     {
@@ -171,6 +185,18 @@ class User implements UserInterface
     public function setRegisteredAt(\DateTimeInterface $registeredAt): self
     {
         $this->registeredAt = $registeredAt;
+
+        return $this;
+    }
+
+    public function getAgreedTermsAt(): ?\DateTimeInterface
+    {
+        return $this->agreedTermsAt;
+    }
+
+    public function agreedTermsAt(): self
+    {
+        $this->agreedTermsAt = new \DateTime();
 
         return $this;
     }

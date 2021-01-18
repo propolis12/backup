@@ -3,3 +3,12 @@
 @import '~@fortawesome/fontawesome-free/css/regular';
 @import '~@fortawesome/fontawesome-free/css/solid';
 @import '~@fortawesome/fontawesome-free/css/brands';
+
+
+.border {
+    border-width: 10px !important;
+}
+
+.container {
+    padding-top: 10% !important;
+}

@@ -42,6 +42,7 @@ final class UserFactory extends ModelFactory
             'email' => self::faker()->email,
             'roles' => self::faker()->boolean(80) ? ['ROLE_USER'] : ['ROLE_ADMIN'],
             'registeredAt' => self::faker()->dateTimeBetween('-20 years', 'now'),
+            'agreedTermsAt' => new \DateTime(),
             'password' => $this->userPasswordEncoder->encodePassword(new User(),'cvina')
         ];
     }
