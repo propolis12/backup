@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{%  block title%}Update your info{% endblock %}
+
+{% block body %}
+
+    {{ parent() }}
+    <div class="container pt-2 ">
+        <div class="row">
+            <div class=" col-8 offset-2 border rounded">
+                {# {% if error %}
+                    <div><p>{{ error }}</p></div>
+                {% endif %} #}
+
+                {{  form_start(updateForm) }}
+                <h1 class="h3 mb-3 font-weight-normal">Update your information</h1>
+
+
+                {{ form_widget(updateForm) }}
+                <button class="btn btn-lg btn-primary" type="submit">
+                    Update
+                </button>
+                {{ form_end(updateForm) }}
+               {# <div class="sign in">
+                    <p class="text-right"><a  href="{{ path( 'app_login' ) }}">or Sign in</a></p>
+                </div> #}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

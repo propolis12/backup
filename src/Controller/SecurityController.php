@@ -4,6 +4,11 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\FormRegisterUserType;
+use App\Form\FormUpdateUserInfoType;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +21,17 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $manager;
+
+    public function __construct(EntityManagerInterface $manager)
+    {
+
+    $this->manager = $manager;}
+
     /**
      * @Route("/login", name="app_login")
      */
@@ -50,8 +66,13 @@ class SecurityController extends AbstractController
 
     /**
      * @Route("/register", name="app_registration")
+     *
+     * @param User $user
+     * @param Request $request
+     * @param UserPasswordEncoderInterface $userPasswordEncoder
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function register(Request $request, UserPasswordEncoderInterface $userPasswordEncoder )
+    public function register( Request $request, UserPasswordEncoderInterface $userPasswordEncoder )
     {
 
         $form = $this->createForm(FormRegisterUserType::class);
@@ -61,7 +82,12 @@ class SecurityController extends AbstractController
 
             /** @var  User $user */
             $user = $form->getData();
-            $user->setPassword($userPasswordEncoder->encodePassword($user , $form['Password']->getData()));
+            if($form['Username']->getData()) {
+                $user->setUsername($form['Username']->getData());
+            }
+            if($form['Password']->getData()) {
+                $user->setPassword($userPasswordEncoder->encodePassword($user, $form['Password']->getData()));
+            }
             $user->setRegisteredAt(new \DateTime("now"));
             $user->setRoles(['ROLE_USER']);
 
@@ -92,5 +118,44 @@ class SecurityController extends AbstractController
             ]
 
         );
+    }
+
+
+
+
+    /**
+     * @param User $user
+     * @param Request $request
+     * @param UserPasswordEncoderInterface $userPasswordEncoder
+     * @param EntityManagerInterface $manager
+     * @Route("/user/{id}/update" , name="app_update")
+     *
+     */
+    public function update(User $user,Request $request , UserPasswordEncoderInterface $userPasswordEncoder, EntityManagerInterface $manager) {
+
+        $form = $this->createForm(FormUpdateUserInfoType::class, $user );
+
+
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid() && $request->isMethod('POST')) {
+            /** @var  User $user */
+            $user = $form->getData();
+            if($form['Username']->getData()) {
+                $user->setUsername($form['Username']->getData());
+            }
+            if($form['Password']->getData()) {
+                $user->setPassword($userPasswordEncoder->encodePassword($user, $form['Password']->getData()));
+            }
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($user);
+            $manager->flush();
+            return $this->redirectToRoute('main_page', ['message' => " Your personal data successfully updated!"] );
+        }
+
+
+
+        return $this->render('security/update.html.twig', [
+            'updateForm' => $form->createView()
+        ]);
     }
 }

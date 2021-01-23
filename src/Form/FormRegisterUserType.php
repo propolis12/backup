@@ -19,7 +19,14 @@ class FormRegisterUserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('Username', TextType::class)
+            ->add('Username', TextType::class, [
+                'mapped' => false,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Choose a username!'
+                    ])
+                ]
+            ])
             //neukladaj plain heslo do DB
             ->add('Password', PasswordType::class , [
                 'mapped' => false,

@@ -2,6 +2,18 @@
 
 {% block title %}Log in!{% endblock %}
 
+{% block javascripts %}
+    <!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>-->
+
+{%  endblock %}
+
+{% block stylesheets %}
+    {{  encore_entry_link_tags('login') }}
+{% endblock %}
+
+
 {% block body %}
     <div class="container pt-2 ">
         <div class="row">
@@ -16,8 +28,8 @@
                             You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
                         </div>
                     {% endif %}
-                    {%  if message %}
-                        <div class="mb-3">
+                    {%  if message is defined %}
+                        <div class="alert-success mb-3">
                             <p> {{ message }}</p>
                         </div>
                     {%  endif %}
@@ -59,12 +71,4 @@
 
 {% endblock %}
 
-{% block javascripts %}
-
-
-{%  endblock %}
-
-{% block stylesheets %}
-{{  encore_entry_link_tags('login') }}
-{% endblock %}
 
