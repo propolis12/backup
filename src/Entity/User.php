@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -14,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      fields={"username"},
  *      message="This username is already registered!"
  *     )
+ * @ApiResource()
  */
 class User implements UserInterface
 {

@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{# {{ parent() }} #}
+{# {% if app.user.roles[1] = "ROLE_ADMIN" %}  #}
+    <div id="app"></div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {{ encore_entry_script_tags('vuePage') }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    {{ encore_entry_link_tags('vuePage') }}
+{% endblock %}

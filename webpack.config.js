@@ -1,4 +1,5 @@
 var Encore = require('@symfony/webpack-encore');
+var path = require('path');
 
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
 // It's useful when you use tools that rely on webpack.config.js file.
@@ -22,6 +23,7 @@ Encore
      */
     .addEntry('app', './assets/app.js')
     .addEntry('main', './assets/main.js')
+    .addEntry('vuePage' , './assets/vuePage.js')
     .addStyleEntry('login', './assets/styles/logn.css')
     .addStyleEntry('register', './assets/styles/register.css')
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
@@ -33,6 +35,11 @@ Encore
     // will require an extra script tag for runtime.js
     // but, you probably want this, unless you're building a single-page app
     .enableSingleRuntimeChunk()
+    // This is our alias to the root vue components dir
+    .addAliases({
+        '@': path.resolve(__dirname, 'assets'),
+        styles: path.resolve(__dirname, 'assets', 'styles'),
+    })
 
     /*
      * FEATURE CONFIG
@@ -58,9 +65,15 @@ Encore
     })
 
     // enables Sass/SCSS support
-    //.enableSassLoader()
+    .enableSassLoader()
 
-    // uncomment if you use TypeScript
+    .enableVueLoader(() => {}, {
+        version: 3,
+        runtimeCompilerBuild: true,
+    })
+
+
+// uncomment if you use TypeScript
     //.enableTypeScriptLoader()
 
     // uncomment if you use React
@@ -72,6 +85,8 @@ Encore
 
     // uncomment if you're having problems with a jQuery plugin
     .autoProvidejQuery()
+
 ;
 
 module.exports = Encore.getWebpackConfig();
+

@@ -4,9 +4,16 @@
 @import '~@fortawesome/fontawesome-free/css/solid';
 @import '~@fortawesome/fontawesome-free/css/brands';
 
+
+.nav {
+    top:0;
+    position: fixed;
+}
 .navbar {
+    /*top: 0;*/
+   /* position: fixed;*/
     min-height: 4rem;
-    background-color: #563d7c !important;
+    background-color: #563d7c ;
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.05),inset 0 -1px 0 rgba(0,0,0,.1);
 }
 
@@ -17,9 +24,6 @@
     margin-left:auto
 }
 
-.row {
-    width: 100%;
-}
 
 .user-img {
     height: 3.125rem !important;
@@ -38,6 +42,12 @@
     text-align: center;
 }
 
+.users-column {
+    height: 100%;
+
+
+}
+
 .footer {
     position: fixed;
     left: 0;
@@ -47,5 +57,12 @@
     background-color: #563d7c;
     text-align: center;
     color: white;
+
+}
+
+.TitleUsers {
+    border-bottom: #001b44;
+    background-color:#3CAAB5;
+    width: 100%;
 
 }
