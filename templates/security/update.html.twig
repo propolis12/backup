@@ -14,9 +14,17 @@
 
                 {{  form_start(updateForm) }}
                 <h1 class="h3 mb-3 font-weight-normal">Update your information</h1>
-
-
-                {{ form_widget(updateForm) }}
+                {# <label for="{{ updateForm.name.vars.value }}"
+                       class="{{ form.name.vars.required ? 'required' : '' }}">
+                    {{ form.name.vars.label }}
+                </label> #}
+                {{  form_row(updateForm.Username , { 'value' : app.user.username }) }}
+                {{ form_row(updateForm.Password) }}
+                {{ form_row(updateForm.email, {'value' : app.user.email }) }}
+                {{ form_row(updateForm.firstname , {'value' : app.user.firstname }) }}
+                {{ form_row(updateForm.lastname , {'value' : app.user.lastname }) }}
+                {# {{ form_rest(updateForm) }} #}
+                {# {{ form_widget(updateForm) }} #}
                 <button class="btn btn-lg btn-primary" type="submit">
                     Update
                 </button>

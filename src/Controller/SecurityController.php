@@ -146,6 +146,9 @@ class SecurityController extends AbstractController
             if($form['Password']->getData()) {
                 $user->setPassword($userPasswordEncoder->encodePassword($user, $form['Password']->getData()));
             }
+            if($form['email']->getData()) {
+                $user->setEmail($form['email']->getData());
+            }
             $manager = $this->getDoctrine()->getManager();
             $manager->persist($user);
             $manager->flush();

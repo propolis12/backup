@@ -5,18 +5,21 @@
 @import '~@fortawesome/fontawesome-free/css/brands';
 
 
-.nav {
-    top:0;
-    position: fixed;
-}
+
+
+/*.main-page {
+    position:relative;z-index:5;
+    background-image: url('../images/satellite-image-of-globe.jpeg');
+}*/
+
 .navbar {
     /*top: 0;*/
-   /* position: fixed;*/
+    /* position: fixed;*/
     width: 100%;
-    border-bottom: #001b44;
     min-height: 4rem;
     background-color: #563d7c !important;
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.05),inset 0 -1px 0 rgba(0,0,0,.1);
+    /*margin-left: 15px;*/
 }
 
 .container-fluid {
@@ -72,3 +75,4 @@
 .bg-light {
     background-color: #563d7c !important;
 }
+

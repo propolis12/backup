@@ -1,7 +1,10 @@
 //import Vue from 'vue';
+import './styles/vuePage.css';
+import './bootstrap';
 
+require('bootstrap')
 import { createApp, compile } from 'vue';
-import App from './pages/users';
+import Users from './pages/users';
 
 
- createApp(App).mount('#app')
+ createApp(Users).mount('#users')

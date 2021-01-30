@@ -30,7 +30,7 @@ class User implements UserInterface
      *
      *
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Assert\NotBlank(message="Please enter the username")
+     *
      */
     private $username;
 

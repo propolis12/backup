@@ -3,12 +3,20 @@
 {% block body %}
 {# {{ parent() }} #}
 {# {% if app.user.roles[1] = "ROLE_ADMIN" %}  #}
-    <div id="app"></div>
+
+
+    <!--<div id="app"></div>-->
 {% endblock %}
 
 
 {% block javascripts %}
     {{ parent() }}
+    <script>
+        {% if is_granted("ROLE_ADMIN") %}
+            window.userIsAdmin = true;
+        {%  endif %}
+        //window.userIsAdmin = true;
+    </script>
 
     {{ encore_entry_script_tags('vuePage') }}
 {% endblock %}
@@ -18,3 +26,6 @@
 
     {{ encore_entry_link_tags('vuePage') }}
 {% endblock %}
+
+
+<a class="dropdown-item" href="{{ path('app_logout') }}">Sign Out</a>

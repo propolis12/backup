@@ -87,10 +87,8 @@ export default {
 </script>
 
 
-<style >
-.navbar {
-  background-color: #563d7c !important;
-}
+<style>
+
 
 
 </style>
