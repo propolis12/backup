@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+{% block title %}Hello MainPageController!{% endblock %}
+{% block head %}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{  parent() }}
+    {# {{ encore_entry_script_tags('main') }}  #}
+    {{ encore_entry_script_tags('vuePage') }}
+{% endblock %}
+
+{% block stylesheets%}
+    {# {{ encore_entry_link_tags('main') }} #}
+    {{ encore_entry_link_tags('vuePage') }}
+{% endblock %}
+{% block body %}
+
+
+ {{ parent() }}
+
+       <!-- <div id="users"></div> -->
+
+
+{% endblock %}
+
+
