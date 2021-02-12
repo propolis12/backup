@@ -30,7 +30,7 @@
     <div class="row">
     {% for image in ownedImages %}
         <div class="col-2">
-            <img class="img-thumbnail"  alt=" {{ image.filename }}"  src="{{ path('send_file', { filename: image.filename})|imagine_filter('rectangular_thumbnail') }}">
+            <img class="img-thumbnail"  alt=" {{ image.filename }}"  src="{{ path('send_file', { filename: image.filename}) }}">
         </div>
 
     {% endfor %}

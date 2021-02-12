@@ -15,6 +15,7 @@
         "doctrine/orm": "^2.8",
         "liip/imagine-bundle": "9999999-dev",
         "nelmio/cors-bundle": "^2.1",
+        "oneup/flysystem-bundle": "9999999-dev",
         "phpdocumentor/reflection-docblock": "^5.2",
         "sensio/framework-extra-bundle": "^5.6",
         "symfony/asset": "5.2.*",

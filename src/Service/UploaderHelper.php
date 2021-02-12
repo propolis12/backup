@@ -17,7 +17,7 @@ class UploaderHelper
 {
 
     /** to public path */
-    const IMAGE_DIRECTORY = '/var/uploadedPhotos';
+    const IMAGE_DIRECTORY = '/photos';
 
 
     /**
@@ -28,18 +28,23 @@ class UploaderHelper
      * @var Security
      */
     private Security $security;
+    /**
+     * @var FilesystemInterface
+     */
+    private FilesystemInterface $filesystem;
 
     /**
      * @var EntityManagerInterface
      */
 
-    public function __construct(/*FilesystemInterface $privateFileSystem, */LoggerInterface $logger,  KernelInterface $kernel, Security $security )
+    public function __construct(FilesystemInterface $uploadFilesystem, LoggerInterface $logger,  KernelInterface $kernel, Security $security )
     {
 
         $this->logger = $logger;
         $this->kernel = $kernel;
         $this->security = $security;
-       // $this->privateFileSystem = $privateFileSystem;
+
+        $this->filesystem = $uploadFilesystem;
     }
 
 
@@ -60,7 +65,20 @@ class UploaderHelper
         $destination = $this->kernel->getProjectDir().'/public/photos';
         $newFilename = pathinfo($originalFilename, PATHINFO_FILENAME).'-'.uniqid().'.'.$uploadedFile->guessExtension();
         //dd($newFilename);
-        $uploadedFile->move($destination, $newFilename);
+        $stream = fopen($uploadedFile->getPathname(), 'r');
+        $result = $this->filesystem->writeStream(
+            $newFilename,
+            $stream
+        );
+
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+
+        if ($result === false) {
+            throw new \Exception(sprintf('Could not write uploaded file "%s"', $newFilename));
+        }
+        //$uploadedFile->move($destination, $newFilename);
 
        /* $stream = fopen($uploadedFile->getPathname(), 'r');
         $this->privateFileSystem->writeStream( self::IMAGE_DIRECTORY.'/'.$newFilename, $stream);*/
