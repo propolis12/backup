@@ -6,11 +6,11 @@
 
         <h5 v-show="!loading && users.length === 0"
         >
-          There are no registered users
+          Submit your password to view registered users
         </h5>
       </div>
     </div>
-    <div class="row">
+    <div>
       <div class="col-4 offset-4 justify-content-center">
         <table class="table">
             <thead class="thead-dark">

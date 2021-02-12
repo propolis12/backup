@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+    <!-- Rest of directives like DocumentRoot or ServerName -->
+
+    Alias /FavouriteAlias /path/to/source/images/dir
+    <Directory "/path/to/source/images/dir">
+        AllowOverride None
+        Allow from All
+    </Directory>
+</VirtualHost>

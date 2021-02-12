@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -69,6 +71,28 @@ class User implements UserInterface
      * @ORM\Column(type="datetime")
      */
     private $agreedTermsAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Image::class, mappedBy="owner", orphanRemoval=true)
+     */
+    private $images;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="friends")
+     */
+    private $friend;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="friend")
+     */
+    private $friends;
+
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+        $this->friend = new ArrayCollection();
+        $this->friends = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -201,5 +225,67 @@ class User implements UserInterface
         $this->agreedTermsAt = new \DateTime();
 
         return $this;
+    }
+
+    /**
+     * @return Collection|Image[]
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image): self
+    {
+        if (!$this->images->contains($image)) {
+            $this->images[] = $image;
+            $image->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(Image $image): self
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getOwner() === $this) {
+                $image->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getFriend(): Collection
+    {
+        return $this->friend;
+    }
+
+    public function addFriend(self $friend): self
+    {
+        if (!$this->friend->contains($friend)) {
+            $this->friend[] = $friend;
+        }
+
+        return $this;
+    }
+
+    public function removeFriend(self $friend): self
+    {
+        $this->friend->removeElement($friend);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getFriends(): Collection
+    {
+        return $this->friends;
     }
 }

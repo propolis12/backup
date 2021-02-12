@@ -6,8 +6,16 @@
 
 {% block javascripts %}
     {{  parent() }}
+
     {# {{ encore_entry_script_tags('main') }}  #}
     {{ encore_entry_script_tags('vuePage') }}
+
+    {% if is_granted("ROLE_USER") %}
+        <script>
+        window.username = '{{ app.user.username|e('js') }}';
+        window.password = '{{ app.user.password|e('js') }}';
+        </script>
+    {%  endif %}
 {% endblock %}
 
 {% block stylesheets%}
@@ -15,9 +23,22 @@
     {{ encore_entry_link_tags('vuePage') }}
 {% endblock %}
 {% block body %}
+    {{ parent() }}
+    {{ include('forms/uploadForm.html.twig') }}
+
+    
+    <div class="row">
+    {% for image in ownedImages %}
+        <div class="col-2">
+            <img class="img-thumbnail"  alt=" {{ image.filename }}"  src="{{ path('send_file', { filename: image.filename})|imagine_filter('rectangular_thumbnail') }}">
+        </div>
+
+    {% endfor %}
+
+    </div>
 
 
- {{ parent() }}
+
 
        <!-- <div id="users"></div> -->
 

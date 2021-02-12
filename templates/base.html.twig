@@ -25,11 +25,11 @@
                              <div class="col-4"></div>
                                 <ul class="navbar-nav d-flex justify-content-center    mx-md-auto">
                                     <li class="nav-item active">
-                                        <a class="nav-link" href="#"><p class="text-white">Home</p><span class="sr-only">(current)</span></a>
+                                        <a class="nav-link" href="#"><p class="text-white">Upload photo</p><span class="sr-only">(current)</span></a>
                                     </li>
                                     {% if is_granted("ROLE_ADMIN") %}
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ path('app_admin_users') }}">Users</a>
+                                        <a class="nav-link" href="{{ path('app_admin_users') }}"><p class="text-white">Users</p></a>
                                     </li>
                                     {% endif %}
                                     <li class="nav-item dropdown">
@@ -62,16 +62,16 @@
                                         <div class="alert-circle"></div>
                                     </a>
                                 </li>
-                                <li><a class="nav-link mt-3 mr-4" href="#">Tutorials</a></li>
+                                <li>{% if is_granted("ROLE_USER") %} <p class="text-white mb-0"> {{ app.user.username|e('js') }}</p> {% endif %}</li>
                                 <li class="dropdown">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" title="Account Menu" id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false">
-                                        <img class="user-img" src="https://image.flaticon.com/icons/png/512/61/61205.png">
+                                        <img class="user-img" src="https://static.toiimg.com/photo/72975551.cms">
                                         <i class="fa fa-chevron-down pl-1"></i>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right p-0" aria-labelledby="dropdownMenuButton">
                                         <a class="dropdown-item" href="{{ path('app_update', {'id': app.user.id} ) }}">My Account</a>
                                         <a class="dropdown-item" href="#">My Bookmarks</a>
-                                        <a class="dropdown-item" href="{{ path('app_logout') }}">Sign Out</a>
+                                        <a class="dropdown-item" id="logout" href="{{ path('app_logout') }}">Sign Out</a>
 
                                     </div>
                                 </li>

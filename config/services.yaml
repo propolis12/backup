@@ -4,12 +4,19 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    uploads_dir_name: 'uploads'
+    uploads_base_url: '/%uploads_dir_name%'
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+
+
+        #bind:
+            #$privateUploadFilesystem: '@oneup_flysystem.private_uploads_filesystem_filesystem'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -29,3 +36,16 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+
+   # App\Listeners\AuthenticationSuccessListener:
+        #arguments: [ '%lexik_jwt_authentication.token_ttl%' ]
+        #tags:
+            #- { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccess , priority: -2 }
+
+
+    #App\Listeners\RefreshedTokenListener:
+        #arguments: ['%gesdinet_jwt_refresh_token.ttl%']
+
+
+

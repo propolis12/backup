@@ -2,8 +2,23 @@
 
 {% block title %}Hello AdminController!{% endblock %}
 
+{% block javascripts %}
+    {{  parent() }}
+
+    {# {{ encore_entry_script_tags('main') }}  #}
+    {{ encore_entry_script_tags('vuePage') }}
+
+    {% if is_granted("ROLE_USER") %}
+        <script>
+            window.username = '{{ app.user.username|e('js') }}';
+        </script>
+    {%  endif %}
+{% endblock %}
+
 {% block body %}
 {{ parent() }}
+
+
     <div id="users"></div>
 
 {% endblock %}

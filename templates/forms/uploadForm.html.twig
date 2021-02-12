@@ -1,0 +1,23 @@
+
+{% block stylesheets %}
+    {{  encore_entry_link_tags('main') }}
+
+{% endblock %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-4">
+            {{ form_start(uploadForm) }}
+
+
+            {{ form_row(uploadForm.image , {
+                attr: {
+                    placeholder: 'Select an image'
+                }
+            }) }}
+
+            <button type="submit" class="btn btn-primary">Upload</button>
+            {{ form_end(uploadForm) }}
+        </div>
+    </div>
+</div>

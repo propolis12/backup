@@ -52,7 +52,7 @@
             "repo": "github.com/symfony/recipes",
             "branch": "master",
             "version": "2.0",
-            "ref": "368794356c1fb634e58b38ad2addb36933f2e73e"
+            "ref": "40631978d2c4adc9b11220b13eba539b727c36a8"
         },
         "files": [
             "config/packages/doctrine.yaml",
@@ -119,6 +119,9 @@
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.3"
     },
+    "imagine/imagine": {
+        "version": "1.2.4"
+    },
     "laminas/laminas-code": {
         "version": "4.0.0"
     },
@@ -127,6 +130,19 @@
     },
     "laminas/laminas-zendframework-bridge": {
         "version": "1.1.1"
+    },
+    "liip/imagine-bundle": {
+        "version": "1.8",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "1.8",
+            "ref": "5a5bdc2d0e2533ed6935d5ae562f2b318a8fc1ee"
+        },
+        "files": [
+            "config/packages/liip_imagine.yaml",
+            "config/routes/liip_imagine.yaml"
+        ]
     },
     "nelmio/cors-bundle": {
         "version": "1.5",
@@ -289,6 +305,9 @@
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
     },
+    "symfony/mime": {
+        "version": "5.2.x-dev"
+    },
     "symfony/options-resolver": {
         "version": "v5.2.1"
     },
@@ -301,6 +320,9 @@
     "symfony/polyfill-intl-icu": {
         "version": "v1.22.0"
     },
+    "symfony/polyfill-intl-idn": {
+        "version": "1.22-dev"
+    },
     "symfony/polyfill-intl-normalizer": {
         "version": "v1.22.0"
     },
@@ -312,6 +334,9 @@
     },
     "symfony/polyfill-php80": {
         "version": "v1.22.0"
+    },
+    "symfony/process": {
+        "version": "5.2.x-dev"
     },
     "symfony/property-access": {
         "version": "v5.2.1"
@@ -440,7 +465,7 @@
             "repo": "github.com/symfony/recipes",
             "branch": "master",
             "version": "1.9",
-            "ref": "579d8de06df2ceb34d39e84e84c0c051b9b5ac68"
+            "ref": "34a82422147bc632dec0db2676bf27aaaa582ba0"
         },
         "files": [
             "assets/app.js",
@@ -470,6 +495,9 @@
     },
     "willdurand/negotiation": {
         "version": "3.0.0"
+    },
+    "zenstruck/callback": {
+        "version": "v1.2.0"
     },
     "zenstruck/foundry": {
         "version": "v1.6.0"

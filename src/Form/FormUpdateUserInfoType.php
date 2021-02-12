@@ -20,19 +20,13 @@ class FormUpdateUserInfoType extends AbstractType
         $builder
             ->add('Username', TextType::class , [
                 'mapped' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Choose your username!'
-                    ])
-                ],
+                'required' => false,
             ] )
             //neukladaj plain heslo do DB
             ->add('Password', PasswordType::class , [
                 'mapped' => false,
+                'required' => false,
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Choose a password!'
-                    ]),
                     new Length([
                         'min' => 5,
                         'minMessage' => 'Password must have at least 5 characters'
@@ -42,8 +36,12 @@ class FormUpdateUserInfoType extends AbstractType
             ->add('email', EmailType::class, [
                 'mapped' => false
             ] )
-            ->add('firstname')
-            ->add('lastname')
+            ->add('firstname', null, [
+                'required' => false,
+            ])
+            ->add('lastname', null, [
+                'required' => false,
+            ])
             //->add('registeredAt')
             //->add('agreedTermsAt')
         ;
