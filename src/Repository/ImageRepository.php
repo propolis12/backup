@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Image;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * @method Image|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,11 +15,35 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ImageRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @var Security
+     */
+    private Security $security;
+
+    public function __construct(ManagerRegistry $registry, Security $security)
     {
         parent::__construct($registry, Image::class);
+        $this->security = $security;
     }
 
+
+    /**
+     * @param string|null $orderByColumn
+     * @param string|null $direction
+     * @return string[] Returns array of owned images filenames
+     */
+    public function getOwnedImagesFilenames(?string $orderByColumn, ?string $direction): array
+    {
+        return  $this->createQueryBuilder('r')
+            ->select('r.filename')
+            ->andWhere('r.owner = :val' )
+            ->setParameter('val' , $this->security->getUser())
+            ->orderBy($orderByColumn ?: 'uploadedAt', $direction ?: "DESC" )
+            ->getQuery()
+            ->getResult()
+        ;
+
+    }
     // /**
     //  * @return Image[] Returns an array of Image objects
     //  */

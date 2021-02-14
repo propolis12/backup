@@ -17,7 +17,7 @@ class UploaderHelper
 {
 
     /** to public path */
-    const IMAGE_DIRECTORY = '/photos';
+    const IMAGE_DIRECTORY = '/var/uploadedPhotos';
 
 
     /**
@@ -52,7 +52,7 @@ class UploaderHelper
 
 
 
-    public function uploadFile(File $uploadedFile , EntityManagerInterface $entityManager): string
+    public function uploadFile(File $uploadedFile): string
     {
         /*/** @var Image $image */
         //$image = new Image();
@@ -109,7 +109,7 @@ class UploaderHelper
     }
 
 
-    public function getPublicPath(string $filename): string
+    public function getFullPath(string $filename): string
     {
          return $this->kernel->getProjectDir().UploaderHelper::IMAGE_DIRECTORY.'/'.$filename;
     }

@@ -46,6 +46,10 @@ services:
 
     #App\Listeners\RefreshedTokenListener:
         #arguments: ['%gesdinet_jwt_refresh_token.ttl%']
+    app.filter_response_listener:
+        class: App\Listeners\ResponseListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.response }
 
 
 

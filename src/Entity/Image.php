@@ -49,6 +49,11 @@ class Image
 
     private $filePath;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $UploadedAt;
+
 
 
     public function getId(): ?int
@@ -124,6 +129,18 @@ class Image
     public function setFilePath(string $filePath): self
     {
         $this->filePath = $filePath;
+
+        return $this;
+    }
+
+    public function getUploadedAt(): ?\DateTimeInterface
+    {
+        return $this->UploadedAt;
+    }
+
+    public function setUploadedAt(\DateTimeInterface $UploadedAt): self
+    {
+        $this->UploadedAt = $UploadedAt;
 
         return $this;
     }

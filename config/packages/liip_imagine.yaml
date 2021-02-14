@@ -3,10 +3,28 @@ liip_imagine:
     # valid drivers options include "gd" or "gmagick" or "imagick"
     driver: "gd"
 
+    loaders:
+        flysystem_loader:
+            flysystem:
+                filesystem_service: oneup_flysystem.default_filesystem_filesystem
+
+    # default loader to use for all filter sets
+    data_loader: flysystem_loader
+
+    resolvers:
+        flysystem_resolver:
+            flysystem:
+                filesystem_service: oneup_flysystem.default_filesystem_filesystem
+                cache_prefix: media/cache
+                root_url: /
+
+
+    cache: flysystem_resolver
+
     filter_sets:
         rectangular_thumbnail:
             filters:
                 thumbnail:
-                    size: [ 200, 200 ]
+                    size: [ 300, 200 ]
                     mode: outbound
                     allow_upscale: true

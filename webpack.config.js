@@ -27,8 +27,11 @@ Encore
      */
     .addEntry('app', './assets/app.js')
     .addEntry('vuePage', './assets/vuePage.js')
+    .addEntry('mainPage', './assets/mainPage.js')
     .addStyleEntry('login', './assets/styles/logn.css')
     .addStyleEntry('main', './assets/styles/main.css')
+    .addStyleEntry('register', './assets/styles/register.css')
+    //.addStyleEntry('mainPage', './assets/styles/mainPage.css')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     .enableStimulusBridge('./assets/controllers.json')

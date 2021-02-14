@@ -35,7 +35,10 @@ class MainPageController extends AbstractController
     public function uploadFileAction(Request $request , EntityManagerInterface $entityManager, Security $security , UploaderHelper $uploaderHelper, ImageRepository $imageRepository , ValidatorInterface $validator): Response
     {
         if ($message = $request->query->get('message')) {}
+        if(!$this->getUser()) {
 
+            return $this->redirectToRoute('app_login', ['message' => "you must log in"] );
+        }
 
         $ownedFiles = $imageRepository->findBy(['owner' => $security->getUser()->getId()]);
 
@@ -48,10 +51,11 @@ class MainPageController extends AbstractController
 
             /** @var Image $image */
             $image = new Image();
-            $newFilename = $uploaderHelper->uploadFile($uploadedFile, $entityManager);
+            $newFilename = $uploaderHelper->uploadFile($uploadedFile);
             $image->setPublic(false);
             $image->setFilename($newFilename);
             $image->setOwner($security->getUser());
+            $image->setUploadedAt(new \DateTimeImmutable("now"));
             $entityManager->persist($image);
             $entityManager->flush();
         }

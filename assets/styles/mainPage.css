@@ -1,0 +1,78 @@
+@import '~bootstrap';
+@import '~@fortawesome/fontawesome-free/css/fontawesome';
+@import '~@fortawesome/fontawesome-free/css/regular';
+@import '~@fortawesome/fontawesome-free/css/solid';
+@import '~@fortawesome/fontawesome-free/css/brands';
+
+
+
+
+/*.main-page {
+    position:relative;z-index:5;
+    background-image: url('../images/satellite-image-of-globe.jpeg');
+}*/
+
+.navbar {
+    /*top: 0;*/
+    /* position: fixed;*/
+    width: 100%;
+    min-height: 4rem;
+    background-color: #563d7c !important;
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.05),inset 0 -1px 0 rgba(0,0,0,.1);
+    /*margin-left: 15px;*/
+}
+
+.container-fluid {
+    padding-right:0;
+    padding-left:0;
+    margin-right:auto;
+    margin-left:auto
+}
+
+
+.user-img {
+    height: 3.125rem !important;
+    width: 3.125rem !important;
+    border-radius: 50%;
+    border: 1px solid #efefee;
+}
+
+.navbar .navbar-nav {
+    display: inline-block;
+    float: none;
+    vertical-align: top;
+}
+
+.navbar .navbar-collapse {
+    text-align: center;
+}
+
+.users-column {
+    height: 100%;
+
+
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3.125rem;
+    background-color: #563d7c;
+    text-align: center;
+    color: white;
+
+}
+
+.TitleUsers {
+    border-bottom: #001b44;
+    background-color:#3CAAB5;
+    width: 100%;
+
+}
+
+.bg-light {
+    background-color: #563d7c !important;
+}
+

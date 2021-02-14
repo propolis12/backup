@@ -20,6 +20,8 @@ export function deleteUser(id) {
    return  axios.delete('/api/users/'+ id )
 }
 
+
+
 /**
  *
  * @returns {Promise}
