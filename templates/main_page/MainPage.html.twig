@@ -9,38 +9,46 @@
 
     {# {{ encore_entry_script_tags('main') }}  #}
     {{ encore_entry_script_tags('mainPage') }}
+    {#  <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js" integrity="sha256-cs4thShDfjkqFGk5s2Lxj35sgSRr4MRcyccmi0WKqCM=" crossorigin="anonymous"></script>#}
 
     {% if is_granted("ROLE_USER") %}
         <script>
         window.username = '{{ app.user.username|e('js') }}';
         window.password = '{{ app.user.password|e('js') }}';
+
+
+
         </script>
     {%  endif %}
 {% endblock %}
 
-{% block stylesheets%}
+{% block stylesheets %}
     {# {{ encore_entry_link_tags('main') }} #}
     {{ encore_entry_link_tags('mainPage') }}
+    {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" integrity="sha256-e47xOkXs1JXFbjjpoRr1/LhVcqSzRmGmPqsrUQeVs+g=" crossorigin="anonymous" /> #}
 {% endblock %}
+
 {% block body %}
     {{ parent() }}
-    {{ include('forms/uploadForm.html.twig') }}
+    {# {{ include('forms/uploadForm.html.twig') }} #}
+    <form action="{{ path('dropzone_upload') }}" method="POST" enctype="multipart/form-data" class="dropzone js-reference-dropzone">
+    </form>
 
-    
-    <div class="row">
-    {% for image in ownedImages %}
+    <div id="photo-list" class="row js-photo-list" data-url="{{ path('get_owned_images') }}">
+
+        {#  {% for image in ownedImages %}
         <div class="col-2 px-0">
             <img class="card-img"  alt=" {{ image.filename }}"  src="{{ path('send_thumbnail', { filename: image.filename}) }}">
         </div>
 
-    {% endfor %}
+        {% endfor %} #}
 
     </div>
 
 
 
 
-       <div id="main"></div>
+<!--<div id="main"></div> -->
 
 
 {% endblock %}

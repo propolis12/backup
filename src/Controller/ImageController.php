@@ -3,13 +3,16 @@
 namespace App\Controller;
 
 
+use App\Entity\Image;
 use App\Form\ImageUpdateType;
 use App\Repository\ImageRepository;
 use App\Service\UploaderHelper;
+use Doctrine\ORM\EntityManagerInterface;
 use ImagickException;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -97,6 +100,7 @@ class ImageController extends AbstractController
      */
 
     public function thumbnailImage(Request $request, string $filename) {
+
         $publicName = $this->uploaderHelper->getFullPath($filename);
         $imagick = new \Imagick($publicName);
         $imagick->setbackgroundcolor('rgb(64, 64, 64)');
@@ -109,13 +113,82 @@ class ImageController extends AbstractController
     }
 
     /**
+     * @Route("/pphoto/{originalName}" , name="latest_image", methods={"GET"})
+     * @param string $originalName
+     */
+    public function latestPhotoThumbnailImage(string $originalName) {
+        $images = $this->imageRepository->findBy(['originalName' => $originalName]);
+
+        /*if ($image->getOwner() === $this->security->getUser()) {
+            $imagePath = $this->uploaderHelper->getFullPath($image->getFilename());
+            $response = new BinaryFileResponse($imagePath);
+            return $response;
+        }*/
+
+    }
+
+    /**
      * @Route("/owned/images", name="get_owned_images", methods={"GET"})
      */
     public function ownedImages(Request $request) {
-        $ownedImages = $this->imageRepository->getOwnedImagesFilenames();
+        $ownedImages = $this->imageRepository->getOwnedImagesFilenames(null, null);
+        //$ownedImages = $this->getUser()->getImages();
+        //print_r($ownedImages);
+       // dd($ownedImages);
+        return new JsonResponse($ownedImages, 200);
+
+    }
+
+    /**
+     *@Route("/upload/dropzone", name="dropzone_upload")
+     */
+    public function handleDropzone(Request $request , UploaderHelper $uploaderHelper , Security $security , EntityManagerInterface $entityManager) {
+        /** @var UploadedFile $uploadedFile */
+        $uploadedFile = $request->files->get('dropzone');
+
+        /** @var Image $image */
+        $image = new Image();
+        $newFilename = $uploaderHelper->uploadFile($uploadedFile);
+        $image->setPublic(false);
+        $image->setFilename($newFilename);
+        $image->setOwner($security->getUser());
+        $image->setUploadedAt(new \DateTimeImmutable("now"));
+        $image->setOriginalName($uploadedFile->getFilename());
+        $entityManager->persist($image);
+        $entityManager->flush();
+        return new JsonResponse("OK", 200);
+
+        /* $uploadedFile = $request->files->get('dropzone');
+         dump($uploadedFile);
+           ;*/
+
+    }
+
+    /**
+     * @Route("/latest/uploaded/photo" , name="latest_photo" , methods={"GET"})
+     * @throws ImagickException
+     */
+    public function getLatestPhotoUploadedName() {
+        $number = $this->imageRepository->getLastOwnedId();
+        //dd($number[0][1]);
+        /** @var Image $image */
+        $image = $this->imageRepository->findOneBy(['id' => $number[0][1]]);
+        //dd($image);
+        //$publicName = $this->uploaderHelper->getFullPath($image->getFilename());
+        /*$imagick = new \Imagick($publicName);
+        $imagick->setbackgroundcolor('rgb(64, 64, 64)');
+        $imagick->thumbnailImage(300, 300, true, true);
+        header("Content-Type: image/jpg");
+        /*$response = new BinaryFileResponse($imagick->getFilename());
+        return $response;*/
+        //echo $imagick->getImageBlob();
+
+        //print_r($photo);
+        return new JsonResponse($image->getFilename(), 200);
 
 
     }
+
 
 
 }

@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Image;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Security;
 
@@ -19,11 +21,16 @@ class ImageRepository extends ServiceEntityRepository
      * @var Security
      */
     private Security $security;
+    /**
+     * @var EntityManagerInterface
+     */
+    private EntityManagerInterface $manager;
 
-    public function __construct(ManagerRegistry $registry, Security $security)
+    public function __construct(ManagerRegistry $registry, Security $security, EntityManagerInterface $manager)
     {
         parent::__construct($registry, Image::class);
         $this->security = $security;
+        $this->manager = $manager;
     }
 
 
@@ -38,12 +45,60 @@ class ImageRepository extends ServiceEntityRepository
             ->select('r.filename')
             ->andWhere('r.owner = :val' )
             ->setParameter('val' , $this->security->getUser())
-            ->orderBy($orderByColumn ?: 'uploadedAt', $direction ?: "DESC" )
+            ->orderBy($orderByColumn ?: 'r.UploadedAt', $direction ?: "DESC" )
             ->getQuery()
             ->getResult()
         ;
 
     }
+
+    public function getLatestPhoto() {
+        return $this->createQueryBuilder('q')
+            ->select('q.filename')
+            ->join('q.image', 'nq')
+
+
+
+
+
+            ->from('image','i')
+                ->select('MAX(i.UploadedAt) as max_date')
+                ->andWhere('q.owner = :val' )
+                ->setParameter('val', $this->security->getUser())
+
+
+
+
+            ->getQuery()
+            ->getResult();
+
+            //->groupBy('q.filename');
+            //->andHaving(max('q.UploadedAt'));
+
+
+
+
+    }
+
+    public function getLastUploaded() {
+        $rsm = new ResultSetMapping();
+        $query = $this->manager->createNativeQuery('SELECT filename from  image ', $rsm);
+        return $query->getResult();
+    }
+
+
+    public function getLastOwnedId() {
+        return  $this->createQueryBuilder('r')
+            ->select('max(r.id)')
+            ->andWhere('r.owner = :val' )
+            ->setParameter('val', $this->security->getUser())
+            ->getQuery()
+            ->getResult();
+
+    }
+
+
+
     // /**
     //  * @return Image[] Returns an array of Image objects
     //  */

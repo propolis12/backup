@@ -54,6 +54,11 @@ class Image
      */
     private $UploadedAt;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $originalName;
+
 
 
     public function getId(): ?int
@@ -141,6 +146,18 @@ class Image
     public function setUploadedAt(\DateTimeInterface $UploadedAt): self
     {
         $this->UploadedAt = $UploadedAt;
+
+        return $this;
+    }
+
+    public function getOriginalName(): ?string
+    {
+        return $this->originalName;
+    }
+
+    public function setOriginalName(string $originalName): self
+    {
+        $this->originalName = $originalName;
 
         return $this;
     }

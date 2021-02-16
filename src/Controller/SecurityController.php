@@ -62,17 +62,9 @@ class SecurityController extends AbstractController
      */
     public function logout(Response $response)
     {
-        //dd($response);
-        $response = new RedirectResponse('app_login');
-        $response->headers->set("Cache-Control","no-cache,no-store, must-revalidate");
-        $response->headers->set("Pragma", "no-cache");
-        $response->headers->set("Expires"," Sat, 26 Jul 1997 05:00:00 GMT");
-        return $response;
-       /* $response->header("Cache-Control","no-cache,no-store, must-revalidate");
-        $response->header("Pragma", "no-cache"); //HTTP 1.0
-        $response->header("Expires"," Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past*/
 
-       // throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+
+        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
     /**

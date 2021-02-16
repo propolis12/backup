@@ -62,7 +62,7 @@ class UploaderHelper
         } else {
             $originalFilename = $uploadedFile->getFilename();
         }
-        $destination = $this->kernel->getProjectDir().'/public/photos';
+        //$destination = $this->kernel->getProjectDir().'/public/photos';
         $newFilename = pathinfo($originalFilename, PATHINFO_FILENAME).'-'.uniqid().'.'.$uploadedFile->guessExtension();
         //dd($newFilename);
         $stream = fopen($uploadedFile->getPathname(), 'r');
