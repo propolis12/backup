@@ -76,3 +76,26 @@
     background-color: #563d7c !important;
 }
 
+.dropzone {
+    position:absolute;
+    z-index:5;
+    width: 500px;
+    margin-left: 70%;
+    border-style: dashed;
+    opacity: 0.8;
+
+}
+
+.dropzone:hover {
+    opacity: 1;
+    border-color: red ;
+
+}
+
+
+#mainContainer {
+    position: relative;
+
+
+}
+

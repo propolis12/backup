@@ -11,7 +11,7 @@ export function fetchImage(filename) {
     return axios.get('/photos/'.filename);
 }
 
-export function fetchLatestImage() {
+export function fetchLatestImages() {
     return axios.get('/latest/uploaded/photo');
 }
 

@@ -31,18 +31,23 @@
 {% block body %}
     {{ parent() }}
     {# {{ include('forms/uploadForm.html.twig') }} #}
-    <form action="{{ path('dropzone_upload') }}" method="POST" enctype="multipart/form-data" class="dropzone js-reference-dropzone">
-    </form>
 
-    <div id="photo-list" class="row js-photo-list" data-url="{{ path('get_owned_images') }}">
+    <div id="mainContainer" class="container-fluid">
 
-        {#  {% for image in ownedImages %}
-        <div class="col-2 px-0">
-            <img class="card-img"  alt=" {{ image.filename }}"  src="{{ path('send_thumbnail', { filename: image.filename}) }}">
-        </div>
 
-        {% endfor %} #}
+                <form id="dropzone" action="{{ path('dropzone_upload') }}" method="POST" enctype="multipart/form-data" class="dropzone js-reference-dropzone">
+                </form>
 
+                <div id="photo-list" class="row js-photo-list" data-url="{{ path('get_owned_images') }}">
+
+                    {#  {% for image in ownedImages %}
+                    <div class="col-2 px-0">
+                        <img class="card-img"  alt=" {{ image.filename }}"  src="{{ path('send_thumbnail', { filename: image.filename}) }}">
+                    </div>
+
+                    {% endfor %} #}
+
+                </div>
     </div>
 
 

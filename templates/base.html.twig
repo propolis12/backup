@@ -10,6 +10,7 @@
 
 
     </head>
+
     <body>
         {% block body %}
             <div class="container-fluid">
@@ -58,7 +59,7 @@
                             <ul id="endHalfNavbar" class="collapse navbar-collapse navbar-nav justify-content-end">
                                 <li id="js-nav-updates">
                                     <a class="nav-link navbar-navlink nav-bell mt-3 mr-4" href="#">
-                                        <i class="fa fa-bell"></i>
+                                        <i id="uploadIcon" class="fas fa-upload fa-2x" ></i>
                                         <div class="alert-circle"></div>
                                     </a>
                                 </li>
@@ -66,7 +67,7 @@
                                 <li class="dropdown">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" title="Account Menu" id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false">
                                         <img class="user-img" src="https://static.toiimg.com/photo/72975551.cms">
-                                        <i class="fa fa-chevron-down pl-1"></i>
+                                        <i class="fa fa-chevron-down pl-1" onclick=""></i>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right p-0" aria-labelledby="dropdownMenuButton">
                                         <a class="dropdown-item" href="{{ path('app_update', {'id': app.user.id} ) }}">My Account</a>
@@ -99,13 +100,16 @@
                 </footer>
             </div>
         {% endblock %}
+
+
         {% block javascripts %}
-            {{ encore_entry_script_tags('vuePage') }}
+
+            {{ encore_entry_script_tags('mainPage') }}
+
         {% endblock %}
 
-
         {% block stylesheets%}
-            {{ encore_entry_link_tags('vuePage') }}
+            {{ encore_entry_link_tags('mainPage') }}
         {% endblock %}
 
     </body>

@@ -64,6 +64,7 @@ class UploaderHelper
         }
         //$destination = $this->kernel->getProjectDir().'/public/photos';
         $newFilename = pathinfo($originalFilename, PATHINFO_FILENAME).'-'.uniqid().'.'.$uploadedFile->guessExtension();
+
         //dd($newFilename);
         $stream = fopen($uploadedFile->getPathname(), 'r');
         $result = $this->filesystem->writeStream(
