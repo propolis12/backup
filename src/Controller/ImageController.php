@@ -9,6 +9,7 @@ use App\Service\UploaderHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use ImagickException;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -42,13 +43,18 @@ class ImageController extends AbstractController
      * @var string[]
      */
     private array $filenamesToRender;
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
 
-    public function __construct(Security $security , ImageRepository $imageRepository ,  UploaderHelper $uploaderHelper ) {
+    public function __construct(Security $security , ImageRepository $imageRepository ,  UploaderHelper $uploaderHelper, LoggerInterface $logger ) {
         $this->security = $security;
         $this->imageRepository = $imageRepository;
         $this->uploaderHelper = $uploaderHelper;
         $this->filenamesToRender = array();
+        $this->logger = $logger;
     }
 
 
@@ -64,16 +70,6 @@ class ImageController extends AbstractController
 
 
 
-    /**
-     * @Route("/upload/photo/{id}" , name="upload_photo")
-     */
-    public function uploadPhoto(Request $request) {
-
-
-        return $this->redirectToRoute('upload_photo', [ 'id' => $this->security->getUser()->getId() , 'message' => " Photo uploaded!"]);
-
-    }
-
 
     /**
      *
@@ -84,7 +80,9 @@ class ImageController extends AbstractController
 
         $image = $this->imageRepository->findOneBy(['originalName' => $originalFilename]);
         if ($image->getOwner() === $this->security->getUser()) {
-            $imagePath = $this->uploaderHelper->getFullPath($image->getFilename());
+            $imagePath = $this->uploaderHelper->getFullPath($image->getOriginalName());
+            //dump($imagePath);
+           // print_r($imagePath);
             $imagick = new \Imagick($imagePath);
             $imagick->setbackgroundcolor('rgb(64, 64, 64)');
             $imagick->thumbnailImage(300, 300, true, true);
@@ -112,7 +110,7 @@ class ImageController extends AbstractController
      */
 
     public function thumbnailImage(Request $request, string $filename) {
-        $image = $this->imageRepository->findOneBy(['filename' => $filename]);
+        $image = $this->imageRepository->findOneBy(['originalName' => $filename]);
         if ($image->getOwner() === $this->security->getUser()) {
             $publicName = $this->uploaderHelper->getFullPath($filename);
             $imagick = new \Imagick($publicName);
@@ -132,7 +130,7 @@ class ImageController extends AbstractController
      */
     public function latestPhotosByOriginalName(string $originalName) {
         /** @var Image $image */
-        $image = $this->imageRepository->findBy(['originalName' => $originalName]);
+        $image = $this->imageRepository->findOneBy(['originalName' => $originalName]);
 
         if ($image->getOwner() === $this->security->getUser()) {
             $imagePath = $this->uploaderHelper->getFullPath($image->getFilename());
@@ -148,11 +146,10 @@ class ImageController extends AbstractController
      */
     public function ownedImages(Request $request) {
         $ownedImages = $this->imageRepository->getOwnedImagesFilenames(null, null);
-        //$ownedImages = $this->getUser()->getImages();
+        //dump($ownedImages);
         //print_r($ownedImages);
-       // dd($ownedImages);
+        //$this->logger->log($ownedImages,"logging data");
         return new JsonResponse($ownedImages, 200);
-
     }
 
     /**
@@ -179,7 +176,7 @@ class ImageController extends AbstractController
         $image->setUploadedAt(new \DateTimeImmutable("now"));
         $originalFilename= $uploadedFile->getClientOriginalName();
         $clientNameExtension = pathinfo($originalFilename, PATHINFO_EXTENSION);
-        if ($uploadedFile->guessExtension() === 'jpg' || $uploadedFile->guessExtension() === 'png') {
+        if ($uploadedFile->guessExtension() === 'jpg' || $uploadedFile->guessExtension() === 'png' || $uploadedFile->guessExtension() === 'gif') {
             $newFilename = $originalFilename;
         } else {
             $newFilename = pathinfo($originalFilename, PATHINFO_FILENAME).".".$uploadedFile->guessExtension();
@@ -221,6 +218,24 @@ class ImageController extends AbstractController
 
 
     }
+
+    /**
+     * @Route("/send/fullPhoto/{filename}", name="send_full_photo")
+     */
+    public function sendPhoto(string $filename)
+    {
+        /** @var Image $image */
+        $image = $this->imageRepository->findOneBy(['originalName' => $filename]);
+
+        if ($image->getOwner() === $this->security->getUser()) {
+            $imagePath = $this->uploaderHelper->getFullPath($image->getOriginalName());
+            $response = new BinaryFileResponse($imagePath);
+            return $response;
+        }
+        return $this->json("Not authorized to view this photo", 401);
+
+    }
+
 
 
 

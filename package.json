@@ -4,6 +4,7 @@
         "@symfony/webpack-encore": "^1.0.0",
         "@vue/compiler-sfc": "^3.0.5",
         "core-js": "^3.0.0",
+        "jquery-mousewheel": "^3.1.13",
         "regenerator-runtime": "^0.13.2",
         "sass": "^1.32.7",
         "sass-loader": "^10.0.0",

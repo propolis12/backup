@@ -68,7 +68,7 @@ class UploaderHelper
         //dd($newFilename);
         $stream = fopen($uploadedFile->getPathname(), 'r');
         $result = $this->filesystem->writeStream(
-            $newFilename,
+            $originalFilename,
             $stream
         );
 

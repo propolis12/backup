@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block title %}Hello MainPageController!{% endblock %}
+{% block head %}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{  parent() }}
+
+
+    {{ encore_entry_script_tags('mainPage') }}
+
+
+{% endblock %}
+
+{% block stylesheets %}
+
+    {{ encore_entry_link_tags('mainPage') }}
+
+{% endblock %}
+
+{% block body %}
+    <footer>
+        <div class="footer justify-content-center d-flex">
+            <p class="pt-2">My own Photocloud made with care 2021 </p>
+        </div>
+
+    </footer>
+{% endblock %}

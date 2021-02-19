@@ -10,7 +10,13 @@ import MainPage from "./pages/mainPage.vue";
 import { createApp } from "vue";
 
 require('bootstrap')
+//jquery_mousewheel($);
+//malihu_custom_scrollbar_plugin($);
 import axios from "axios";
+
+//import {jquery_mousewheel} from "jquery-mousewheel";
+
+//import {malihu_custom_scrollbar_plugin} from "malihu-custom-scrollbar-plugin";
 
 createApp(MainPage).mount('#main')
 
@@ -23,13 +29,36 @@ $('.custom-file-input').on('change', function (event) {
 
 })
 
+var ownedImages;
 
 $(document).ready(function() {
+
+
+    /*$("#sidebar").mCustomScrollbar({
+        theme: "minimal"
+    });*/
+    $('#sidebarCollapse').hide();
+    $('.sidebar-header').on('click', function () {
+        sidebarResponsive();
+    });
+
+    $('#sidebarCollapse').on('click', function () {
+        sidebarResponsive();
+
+    });
+    // close dropdowns
+    $('.collapse.in').toggleClass('in');
+    // and also adjust aria-expanded attributes we use for the open/closed arrows
+    // in our CSS
+    $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+
+
     $('#dropzone').hide();
+    renderImages().then(r => response);
 
     initializeDropzone();
     let response;
-    renderImages().then(r => response);
+
     //getFiles();
    // var imagesList = new ImageList($('.js-photo-list'));
 });
@@ -79,22 +108,23 @@ async function appendImage(names) {
     //var image;
     //image = await fetchLatestImages();
     console.log(names[i]);
-    $('#photo-list').append($('<img>',{src:'/latest/photos/'+ names[i], alt: 'photo'}))
+    $('#photo-list').append($('<img>',{src:'/latest/photos/'+ names[i], alt: 'photo' , click:  function () { openWindow(this.src,37) }}))
     }
+    ownedImages = await fetchOwnedImages();
 }
 
 
 
 async function renderImages() {
-    var ownedImages = await fetchOwnedImages();
+     ownedImages = await fetchOwnedImages();
     //console.log(ownedImages.data[0]['filename']);
     //console.log(ownedImages.data.length);
-
+    console.log(ownedImages);
     for(var i = 0 ; i < ownedImages.data.length ; i++) {
-        $('#photo-list').append($('<img>',{src:'/photo/'+ ownedImages.data[i]['filename'], alt: 'photo '+i}))
+        var parent = i;
+        $('#photo-list').append($('<img>',{src:'/photo/'+ ownedImages.data[i]['originalName'], alt: 'photo '+i , click: function () { openWindow(this.src,29) } }))
     }
 }
-
 
 
 
@@ -102,5 +132,28 @@ async function renderImages() {
             $('#dropzone').toggle();
     })
 
+function sidebarResponsive() {
+    $('#sidebar').toggleClass('active');
+    $('#sidebar-wrapper').toggleClass('col-2');
+    $('#sidebar-wrapper').toggleClass('col-0');
+    $('#content-wrapper').toggleClass('col-10');
+    $('#content-wrapper').toggleClass('col-12');
+    if(!($('#sidebar').hasClass('active'))) {
+        $('#sidebarCollapse').hide();
+    } else {
+        $('#sidebarCollapse').show();
+    }
+    //$('#collapseButton').toggleClass('fas fa-arrow-circle-right');
+}
 
 
+/** name - url of the image from source attribute
+ * number - position of actual name in name(url) parameter
+ * we want extract only the name , because the name(url) is not a good response for this request */
+function openWindow(name , number) {
+console.log(name.substr(number));
+   window.open('/send/fullPhoto/' + name.substr(number));
+    //'/send/fullPhoto/' + ownedImages.data[i]['filename'];
+
+
+}

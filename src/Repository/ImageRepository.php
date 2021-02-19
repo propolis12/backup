@@ -41,14 +41,19 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function getOwnedImagesFilenames(?string $orderByColumn, ?string $direction): array
     {
-        return  $this->createQueryBuilder('r')
-            ->select('r.filename')
+            return $this->createQueryBuilder('r')
+            ->select('r.originalName, r.latitude, r.longitude, r.UploadedAt')
             ->andWhere('r.owner = :val' )
             ->setParameter('val' , $this->security->getUser())
             ->orderBy($orderByColumn ?: 'r.UploadedAt', $direction ?: "DESC" )
             ->getQuery()
             ->getResult()
         ;
+         $returnArray = array();
+        foreach ($entities as $entity) {
+        $returnArray[get_class($entity)] = $entity;
+        }
+    return $returnArray;
 
     }
 
