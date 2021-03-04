@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+{% block title %}Hello{% endblock %}
+{% block head %}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{  parent() }}
+
+    {{ encore_entry_script_tags('mainPage') }}
+
+    <script>
+        function closeImage() {
+            $('#fullscreenPicture').hide();
+        }
+    </script>
+
+{% endblock %}
+
+{% block stylesheets %}
+
+    {{ encore_entry_link_tags('mainPage') }}
+
+
+{% endblock %}
+
+
+{% block body%}
+<div id="fullscreenPicture">
+
+   <!-- <div class="row justify-content-between "> -->
+        <!--<div class="col-2"> -->
+
+    <div id="insertPicture" >
+
+    </div>
+    <div class="imageIcons" >
+    <span id="navigateLeftSpan" ><i  class="fas fa-arrow-circle-left fa-2x"></i></span>
+    <span id="navigateRightSpan" ><i  class="fas fa-arrow-circle-right fa-2x"></i></span>
+    <span id="closeFullScreenSpan" > <i  class="far fa-times-circle fa-2x"></i></span>
+    </div>
+
+</div>
+
+
+
+
+{% endblock %}

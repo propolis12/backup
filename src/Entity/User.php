@@ -87,11 +87,17 @@ class User implements UserInterface
      */
     private $friends;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Album::class, mappedBy="owner", orphanRemoval=true)
+     */
+    private $albums;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
         $this->friend = new ArrayCollection();
         $this->friends = new ArrayCollection();
+        $this->albums = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -287,5 +293,35 @@ class User implements UserInterface
     public function getFriends(): Collection
     {
         return $this->friends;
+    }
+
+    /**
+     * @return Collection|Album[]
+     */
+    public function getAlbums(): Collection
+    {
+        return $this->albums;
+    }
+
+    public function addAlbum(Album $album): self
+    {
+        if (!$this->albums->contains($album)) {
+            $this->albums[] = $album;
+            $album->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlbum(Album $album): self
+    {
+        if ($this->albums->removeElement($album)) {
+            // set the owning side to null (unless already changed)
+            if ($album->getOwner() === $this) {
+                $album->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }

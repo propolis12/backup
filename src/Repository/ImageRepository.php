@@ -45,7 +45,7 @@ class ImageRepository extends ServiceEntityRepository
             ->select('r.originalName, r.latitude, r.longitude, r.UploadedAt')
             ->andWhere('r.owner = :val' )
             ->setParameter('val' , $this->security->getUser())
-            ->orderBy($orderByColumn ?: 'r.UploadedAt', $direction ?: "DESC" )
+            ->orderBy($orderByColumn ?: 'r.UploadedAt', $direction ?: "ASC" )
             ->getQuery()
             ->getResult()
         ;

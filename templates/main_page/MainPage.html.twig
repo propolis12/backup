@@ -2,6 +2,10 @@
 {% block title %}Hello MainPageController!{% endblock %}
 {% block head %}
 
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>mainPage</title>
+    </head>
 {% endblock %}
 
 {% block javascripts %}
@@ -17,9 +21,8 @@
         <script>
         window.username = '{{ app.user.username|e('js') }}';
         window.password = '{{ app.user.password|e('js') }}';
-
-
         </script>
+
     {%  endif %}
 {% endblock %}
 
@@ -27,35 +30,37 @@
     {# {{ encore_entry_link_tags('main') }} #}
     <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">-->
     {{ encore_entry_link_tags('mainPage') }}
+    {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css"> #}
     {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" integrity="sha256-e47xOkXs1JXFbjjpoRr1/LhVcqSzRmGmPqsrUQeVs+g=" crossorigin="anonymous" /> #}
-
 {% endblock %}
 
 {% block body %}
     {{ parent() }}
-
+    {{  include('image/fullscreen.html.twig') }}
 <div class="wrapper">
 
     <!-- Sidebar -->
     <div id="sidebar-wrapper" class="col-2">
+
         <nav id="sidebar">
             <div class="sidebar-header">
-                <h3>Bootstrap Sidebar</h3>
+                <h3 id="sidebarHeader">All Images</h3>
             </div>
 
             <ul class="list-unstyled components">
-                <p>Dummy Heading</p>
+                <li>
+                    <a href="#" id="loadAllImagesLi">All images</a>
+                </li>
                 <li class="active">
-                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
+                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Albums</a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
-                        <li>
-                            <a href="#">Home 1</a>
+                        <li id="createAlbumLi">
+                            <a href="#">Create new <i class="fas fa-plus"></i></a>
                         </li>
-                        <li>
-                            <a href="#">Home 2</a>
-                        </li>
-                        <li>
-                            <a href="#">Home 3</a>
+
+                        <li id="newAlbumLi">
+                            <input id="albumNameTextInput" type="text" placeholder="enter name" required="required">
+                            <input id="createAlbumInputButton" type="submit" value="create">
                         </li>
                     </ul>
                 </li>
@@ -82,7 +87,19 @@
                 <li>
                     <a href="#">Contact</a>
                 </li>
+
             </ul>
+            <!--<div class="row" >
+                <div class="col-12" id="inputRow">
+                    <input type="text" id="tags" data-role="tagsinput"/>
+                </div>
+            </div>-->
+            <div id="tag-container">
+                <input placeholder="search for tags" id="inputSearchTags"/>
+
+            </div>
+            <input id="searchTagsButton" class="btn btn-primary" type="button" value="search">
+
 
         </nav>
 
@@ -92,16 +109,68 @@
 
 
     <div id="content-wrapper" class="col-10">
+
         <div id="content" class="container-fluid">
+            <nav id="editNavbar" class="navbar navbar-expand-lg navbar-light bg-light">
+                <i class="fas fa-times fa-2x" id="closeNavbar"></i>
+                <a id="nav-brandEditNavbar" class="navbar-brand" href="#"> All images</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse " id="navbarSupportedContent">
+                    <div class="col-3"></div>
+                    <ul class="navbar-nav d-flex justify-content-start">
+                        <li class="nav-item">
+                            <a class="nav-link" id="deleteImagesNav" href="#">Delete<span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item dropdown ">
+                            <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Add to album
+                            </a>
+                            <div id="addToAlbumDropdown" class="dropdown-menu" aria-labelledby="navbarDropdown">
+                               <!-- <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Something else here</a> -->
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="deleteOnlyFromAlbumLi" href="#">Delete from this album<span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="addTag" href="#">Add tag<span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item " id="addTagLi">
+                            <input id="addTagInput" placeholder="type tags here"
+                             />
+                            <input type="button" id="addTagButton" class="btn btn-primary" value="Add"/>
+
+                        </li>
+
+
+
+                    </ul>
+                    <div id="forTags" class="col-2"></div>
+
+                </div>
+            </nav>
             <button type="button" id="sidebarCollapse" class="btn btn-info">
                 <i id="collapseButton" class="fas fa-arrow-circle-right"></i>
             </button>
 
 
                     <form id="dropzone" action="{{ path('dropzone_upload') }}" method="POST" enctype="multipart/form-data" class="dropzone js-reference-dropzone">
+                        <input type="hidden" id="hiddenDropzoneInput">
                     </form>
 
+
+
+
+
                     <div id="photo-list" class="row js-photo-list" data-url="{{ path('get_owned_images') }}">
+
+
 
                         {#  {% for image in ownedImages %}
                         <div class="col-2 px-0">
@@ -110,11 +179,13 @@
 
                         {% endfor %}
                         #}
+
                         <script>
 
                         </script>
 
                     </div>
+
         </div>
     </div>
 

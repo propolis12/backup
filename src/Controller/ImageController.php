@@ -9,6 +9,7 @@ use App\Service\UploaderHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use ImagickException;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use phpDocumentor\Reflection\Types\This;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -85,7 +86,7 @@ class ImageController extends AbstractController
            // print_r($imagePath);
             $imagick = new \Imagick($imagePath);
             $imagick->setbackgroundcolor('rgb(64, 64, 64)');
-            $imagick->thumbnailImage(300, 300, true, true);
+            $imagick->thumbnailImage(300, 200, false, false);
             header("Content-Type: image/jpg");
             /*$response = new BinaryFileResponse($imagick->getFilename());
             return $response;*/
@@ -115,7 +116,7 @@ class ImageController extends AbstractController
             $publicName = $this->uploaderHelper->getFullPath($filename);
             $imagick = new \Imagick($publicName);
             $imagick->setbackgroundcolor('rgb(64, 64, 64)');
-            $imagick->thumbnailImage(300, 300, true, true);
+            $imagick->thumbnailImage(300, 200, false, false);
             header("Content-Type: image/jpg");
             /*$response = new BinaryFileResponse($imagick->getFilename());
             return $response;*/
@@ -158,6 +159,8 @@ class ImageController extends AbstractController
     public function handleDropzone(Request $request , UploaderHelper $uploaderHelper , Security $security , EntityManagerInterface $entityManager, ValidatorInterface $validator ) {
         /** @var UploadedFile $uploadedFile */
         $uploadedFile = $request->files->get('dropzone');
+        $albumName = $request->request->get('data');
+        //$albumName = $request->request->get('hiddenDropzoneInput');
         $violations = $validator->validate(
             $uploadedFile,
             new \Symfony\Component\Validator\Constraints\Image(),
@@ -166,6 +169,7 @@ class ImageController extends AbstractController
         if ($violations->count() > 0) {
             return new JsonResponse("bad file type", 400);
         }
+
         /** @var Image $image */
         $image = new Image();
         $newFilename = $uploaderHelper->uploadFile($uploadedFile);
@@ -182,9 +186,17 @@ class ImageController extends AbstractController
             $newFilename = pathinfo($originalFilename, PATHINFO_FILENAME).".".$uploadedFile->guessExtension();
         }
         $image->setOriginalName($newFilename);
+        if($albumName !== '') {
+            $ownedAlbums = $this->getUser()->getAlbums();
+            foreach ($ownedAlbums as $album) {
+                if ($album->getName() === $albumName) {
+                    $album->addImage($image);
+                }
+            }
+        }
         $entityManager->persist($image);
         $entityManager->flush();
-        return new JsonResponse("OK", 201);
+        return new JsonResponse($albumName, 201);
 
         /* $uploadedFile = $request->files->get('dropzone');
          dump($uploadedFile);
@@ -237,6 +249,31 @@ class ImageController extends AbstractController
     }
 
 
+    /**
+     * @Route("/delete/image/{filename}", name="delete_image" , methods={"DELETE"})
+     */
+    public function deleteImage(Request $request, string $filename, EntityManagerInterface $entityManager) {
+         /** @var Image $image */
+        $image = $this->imageRepository->findOneBy(['originalName' => $filename]);
+        if($image->getOwner() === $this->security->getUser()) {
+            $entityManager->remove($image);
+            $entityManager->flush();
+            return $this->json($filename . " was deleted ", 204);
 
+        }
+        return $this->json("Not authorized to delete some of the  files", 401);
+
+    }
+
+
+    /**
+     * @Route("/get/images" , name="get_images")
+     */
+    public function getImages() {
+        $images = $this->security->getUser()->getImages();
+        return $this->json($images, 200 ,[],[
+            'groups' => ['image']
+        ]);
+    }
 
 }

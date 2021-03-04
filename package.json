@@ -26,6 +26,8 @@
         "@fortawesome/fontawesome-free": "^5.15.2",
         "axios": "^0.21.1",
         "bootstrap": "^4.6.0",
+        "bootstrap-tags": "^1.0.0",
+        "bootstrap-tagsinput": "^0.7.1",
         "dropzone": "^5.7.6",
         "jquery": "^3.5.1",
         "popper.js": "^1.16.1",

@@ -1,4 +1,5 @@
 import axios from "axios";
+import $ from "jquery";
 
 
 export function fetchOwnedImages() {
@@ -15,3 +16,10 @@ export function fetchLatestImages() {
     return axios.get('/latest/uploaded/photo');
 }
 
+export function deleteImage(name) {
+    return axios.delete('/delete/image/'+ name);
+}
+
+export function fetchImages() {
+    return axios.get('/get/images');
+}

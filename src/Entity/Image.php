@@ -5,7 +5,10 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ImageRepository;
 use App\Service\UploaderHelper;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource()
@@ -17,27 +20,32 @@ class Image
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("image")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("image")
      */
     private $filename;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="images")
      * @ORM\JoinColumn(nullable=false)
+     *
      */
     private $owner;
 
     /**
      * @ORM\Column(type="decimal", precision=15, scale=10, nullable=true)
+     * @Groups("image")
      */
     private $latitude;
 
     /**
      * @ORM\Column(type="decimal", precision=15, scale=10, nullable=true)
+     * @Groups("image")
      */
     private $longitude;
 
@@ -51,13 +59,32 @@ class Image
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups("image")
      */
     private $UploadedAt;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("image")
      */
     private $originalName;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Album::class, mappedBy="image")
+     */
+    private Collection $albums;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Tag::class, mappedBy="image")
+     * @Groups("image")
+     */
+    private $tags;
+
+    public function __construct()
+    {
+        $this->albums = new ArrayCollection();
+        $this->tags = new ArrayCollection();
+    }
 
 
 
@@ -158,6 +185,60 @@ class Image
     public function setOriginalName(string $originalName): self
     {
         $this->originalName = $originalName;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Album[]
+     */
+    public function getAlbums(): Collection
+    {
+        return $this->albums;
+    }
+
+    public function addAlbum(Album $album): self
+    {
+        if (!$this->albums->contains($album)) {
+            $this->albums[] = $album;
+            $album->addImage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAlbum(Album $album): self
+    {
+        if ($this->albums->removeElement($album)) {
+            $album->removeImage($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Tag[]
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+    public function addTag(Tag $tag): self
+    {
+        if (!$this->tags->contains($tag)) {
+            $this->tags[] = $tag;
+            $tag->addImage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag): self
+    {
+        if ($this->tags->removeElement($tag)) {
+            $tag->removeImage($this);
+        }
 
         return $this;
     }
