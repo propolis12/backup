@@ -542,3 +542,8 @@ input {
 #inputSearchTags {
     border-radius: 25px;
 }
+
+#forTagsSearch {
+    display: flex;
+    flex-wrap: wrap;
+}

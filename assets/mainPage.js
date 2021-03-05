@@ -29,11 +29,12 @@ $('.custom-file-input').on('change', function (event) {
 var albums = [];
 var  selected  = [];
 var allOwnedImages = [];
-var currentNameSet;
+var currentNameSet = [];
 var currentAlbum = '';
-var ownedImages;
+var ownedImages = [];
 var currentImageIndex;
 var myImages = [];
+var currentImages = []
 
 $(document).ready(async function() {
     //console.log(tags + "sdasfafadfsadfsadfsafsafsdfsfsdfsdfsdfscscscsdcs")
@@ -42,7 +43,7 @@ $(document).ready(async function() {
     $('#addTagLi').hide()
     $('#deleteOnlyFromAlbumLi').hide()
     $('#editNavbar').hide()
-    allOwnedImages = await fetchOwnedImages()
+    allOwnedImages = await fetchImages()
     renderImages().then(r => {
         $('.thumbnailIcons').hide()
         setHoveringOverImages()
@@ -282,8 +283,15 @@ async function appendImage(names) {
     $('#photo-list').append('<div id=' + (currentNameSet.length + i)  + '  class="thumbnailDiv" ><div class="thumbnailIcons" ><i class="far fa-check-circle fa-2x selectable"></i></div></div>')
     $('#' + (currentNameSet.length + i)).append($('<img>',{src:'/latest/photos/'+ names[i], alt: '' ,'data-name': names[i] , click:  function () { openWindow(this.dataset.name, currentNameSet) } , class:'thumbnailImage' , loading: 'lazy'}))
     }
-    ownedImages = await fetchOwnedImages();
-
+    ownedImages = await fetchImages();
+    //currentImages = ownedImages
+    for (var i = 0 ; i < ownedImages.data.length; i++) {
+        for (var j = 0 ; j < currentNameSet.length; j++) {
+            if(ownedImages.data[i]["originalName"] === currentNameSet[j]) {
+                currentImages.push(ownedImages.data[i])
+            }
+        }
+    }
     $('.thumbnailIcons').hide()
     setHoveringOverImages()
 }
@@ -296,14 +304,15 @@ async function renderImages() {
     var albumImages = []
     var ownedImagesNames = []
     if (currentAlbum === '') {
-        ownedImages = await fetchOwnedImages();
+        ownedImages = await fetchImages();
         for (var i = 0 ; i  < ownedImages.data.length; i++) {
             ownedImagesNames[i] = ownedImages.data[i]['originalName']
         }
         currentNameSet = ownedImagesNames
-
+        currentImages = ownedImages.data
     } else {
         albumImages = await fetchAlbumImages(currentAlbum)
+        currentImages = albumImages.data
         for (var i = 0 ; i < albumImages.data[0].length ; i++ ){
             ownedImagesNames[i] = albumImages.data[0][i]['originalName']
         }
@@ -352,6 +361,14 @@ function sidebarResponsive() {
     }
     //$('#collapseButton').toggleClass('fas fa-arrow-circle-right');
 }
+
+
+
+$(document).on('click', '.thumbnailImage', function () {
+
+})
+
+
 
 
 /** Full photo controls
@@ -562,15 +579,6 @@ function reloadEditingTools() {
     $('.dropzone').hide()
 }
 
-/*$(document).on('submit', '.bootstrap-tagsinput input' , function () {
-    $(this).prepend('<span class="x">x</span>')
-})*/
-
-/*$(function () {
-    $('.tag.label.label-info').prepend('<span class="x">x</span>')
-})*/
-
-
 
 /** hint pre tagy */
 
@@ -590,7 +598,7 @@ function reloadEditingTools() {
  * logic for tags
  */
 
-const tagContainer = document.querySelector('#tag-container');
+const tagContainer = document.querySelector('#forTagsSearch');
 const inputTagsSearch = document.querySelector('#tag-container input');
 
 const tagContainerEdit = document.querySelector('#forTags')
@@ -713,9 +721,6 @@ inputTagEdit.focus();
  * listeners for tags
  */
 
-$(document).on('click','#searchTagsButton', function () {
-
-})
 
 $(document).on('click','#addTag', async function () {
     $('#addTagLi').toggle()
@@ -740,7 +745,63 @@ $(document).on('click', '#addTagButton' , async function () {
 })
 
 $(document).on('click', '#searchTagsButton', async function() {
+    console.log(tags + "a toto je dlzka " + tags.length)
+    console.log(currentImages.length + " dlazka currentImages")
+    if (tags.length > 0) {
+        $('.thumbnailDiv').hide()
+    }
 
+    var resultImages = [];
+    var hasAll = true
+    var tagsLength = tags.length
+    for(var i = 0; i < currentImages.length ; i++ ) {
+        console.log(currentImages[i]["tags"] + "toto su tagy obrazku")
+        hasAll = true
+        if(currentImages[i]["tags"].length <= 0){
+            continue
+        }
+        for (var j = 0; j < tags.length ; j++) {
+            let currentImageTagsLength = currentImages[i]["tags"].length
+            for (var x = 0 ; x < currentImages[i]["tags"].length; x++) {
+                if((currentImages[i]["tags"][x]["name"] !== tags[j])) {
+                    console.log(currentImages[i]["tags"][x]["name"] + " toto je currentimage meno")
+                    if(x === (currentImageTagsLength - 1)) {
+                        console.log("nerovnaju sa")
+                        hasAll = false
+                        break
+                    }
+                } else {
+                    break
+                }
+            }
+          if (!hasAll) {
+             break
+          }
+        }
+        if (hasAll) {
+            console.log(i + " toto je cislo obrazku")
+            console.log("ma to tag " )
+            console.log(resultImages + "result images pred priradenim")
+            resultImages.push(currentImages[i])
+            console.log(resultImages[0]["originalname"] + " result images po priradeni")
+        }
+    }
+
+
+
+
+    console.log(resultImages)
+    tags = []
+    $('#forTagsSearch').html('')
+    console.log("------------------------------------------------------------------------------------------------")
+    for (i = 0 ; i < resultImages.length ; i ++) {
+        console.log(resultImages[i]["originalName"])
+        $('.thumbnailImage').filter(function () {
+            console.log($(this).data('name'))
+            return $(this).data('name') === resultImages[i]["originalName"]
+        }).parent().show()
+
+    }
 
 })
 
