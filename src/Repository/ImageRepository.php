@@ -103,6 +103,21 @@ class ImageRepository extends ServiceEntityRepository
     }
 
 
+    public function getPublicImages() {
+        return $this->createQueryBuilder('r')
+            ->select('r.originalName, r.latitude, r.longitude, r.UploadedAt , r.publishedAt, o.username')
+            ->join('r.owner', 'o')
+            ->andWhere('r.public = :val' )
+            ->setParameter('val' , 1)
+            //->orderBy($orderByColumn ?: 'r.UploadedAt', $direction ?: "ASC" )
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getPublicImages2() {
+         $result = $this->findBy(['public' => 1]);
+         return array($result);
+    }
 
     // /**
     //  * @return Image[] Returns an array of Image objects

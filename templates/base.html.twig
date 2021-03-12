@@ -27,7 +27,7 @@
                              <div class="col-4"></div>
                                 <ul class="navbar-nav d-flex justify-content-center    mx-md-auto">
                                     <li class="nav-item active">
-                                        <a class="nav-link" href="#"><p class="text-white">Upload photo</p><span class="sr-only">(current)</span></a>
+                                        <a class="nav-link" href="{{ path('shared_photos') }}"><p class="text-white" id="sharedPhotos">Shared Photos</p><span class="sr-only">(current)</span></a>
                                     </li>
                                     {% if is_granted("ROLE_ADMIN") %}
                                     <li class="nav-item">
@@ -95,12 +95,12 @@
 
         {% block javascripts %}
 
-            {{ encore_entry_script_tags('mainPage') }}
+{# {{ encore_entry_script_tags('mainPage') }} #}
 
         {% endblock %}
 
         {% block stylesheets%}
-            {{ encore_entry_link_tags('mainPage') }}
+{# {{ encore_entry_link_tags('mainPage') }} #}
         {% endblock %}
 
     </body>

@@ -323,6 +323,12 @@ margin-left: 5px;
 margin-top: 5px;
 }
 
+
+.thumbnailImageShared {
+margin-left: 5px;
+margin-top: 5px;
+}
+
 .AlbumListItem {
     padding:10px;
 }
@@ -332,6 +338,13 @@ margin-top: 5px;
     padding-top: 3px;
     padding-left: 2px;
 
+}
+
+
+.thumbnailDivShared {
+    position: relative;
+    padding-top: 3px;
+    padding-left: 2px;
 }
 
 .thumbnailImage {
@@ -350,6 +363,13 @@ margin-top: 5px;
     right: 5%;
     z-index: 999;
 
+}
+
+.thumbnailIconsShared {
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    z-index: 999;
 }
 
 .thumbnailDiv .thumbnailIcons:hover {
@@ -546,4 +566,23 @@ input {
 #forTagsSearch {
     display: flex;
     flex-wrap: wrap;
+}
+
+#content-shared {
+    margin-top: 80px;
+    margin-left: 15px;
+
+}
+
+.fa-heart {
+    color: wheat;
+}
+
+.ownerNameDiv {
+    margin-left: 5px;
+    padding-right: 15px;
+}
+.publicInfoDiv {
+    display: flex;
+    justify-content: center;
 }

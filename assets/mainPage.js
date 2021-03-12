@@ -1,8 +1,15 @@
-import {insertTags} from "@/tag-services";
+import {insertTags} from "@/services/tag-services";
 
 Dropzone .autoDiscover = false;
-import {fetchLatestImages, fetchOwnedImages, deleteImage, fetchImages} from "@/services/images-service";
-import {postAlbum, fetchAlbums, fetchAlbumImages, addToAlbum, deleteOnlyFromAlbum} from "@/album-services";
+import {
+    fetchLatestImages,
+    fetchOwnedImages,
+    deleteImage,
+    fetchImages,
+    getImageInfo,
+    makePublic, makePrivate
+} from "@/services/images-service";
+import {postAlbum, fetchAlbums, fetchAlbumImages, addToAlbum, deleteOnlyFromAlbum} from "@/services/album-services";
 import './bootstrap';
 import './styles/mainPage.css';
 import dropzone from "dropzone";
@@ -39,7 +46,7 @@ var currentImages = []
 $(document).ready(async function() {
     //console.log(tags + "sdasfafadfsadfsadfsafsafsdfsfsdfsdfsdfscscscsdcs")
     myImages  = await fetchImages();
-    console.log(myImages.data[6]["tags"][0]["name"]);
+    //console.log(myImages.data[6]["tags"][0]["name"]);
     $('#addTagLi').hide()
     $('#deleteOnlyFromAlbumLi').hide()
     $('#editNavbar').hide()
@@ -135,7 +142,7 @@ $(document).on('click', '.fa-trash', async function () {
 
 
 
-function setHoveringOverImages() {
+ export function setHoveringOverImages() {
     $('.thumbnailImage').mouseover(
         function () {
             $(this).siblings().show()
@@ -277,18 +284,36 @@ function initializeDropzone() {
 
 
 async function appendImage(names) {
-    currentNameSet.push(names)
+    //console.log(ownedImages.data.length + "toto je dlzka owned images pred append")
+    //console.log(currentNameSet.length + " toto je dlzka namesetu pred")
+    /*for (let i = 0 ; i < names.length ; i++) {
+
+    }
+    currentNameSet.push(names)*/
+    currentNameSet = currentNameSet.concat(names)
+    console.log(currentNameSet)
+    //console.log(currentNameSet.length + " toto je dlzka namesetu po ")
     for(let i = 0; i < names.length; i++) {
-    console.log(names[i]);
-    $('#photo-list').append('<div id=' + (currentNameSet.length + i)  + '  class="thumbnailDiv" ><div class="thumbnailIcons" ><i class="far fa-check-circle fa-2x selectable"></i></div></div>')
-    $('#' + (currentNameSet.length + i)).append($('<img>',{src:'/latest/photos/'+ names[i], alt: '' ,'data-name': names[i] , click:  function () { openWindow(this.dataset.name, currentNameSet) } , class:'thumbnailImage' , loading: 'lazy'}))
+   // console.log(names[i]);
+    $('#photo-list').append('<div id=' + (currentNameSet.length)  + '  class="thumbnailDiv" ><div class="thumbnailIcons" ><i class="far fa-check-circle fa-2x selectable"></i></div></div>')
+    $('#' + (currentNameSet.length + i)).append($('<img>',{src:'/photo/'+ names[i], alt: '' ,'data-name': names[i] , /*click:  function () { openWindow(this.dataset.name, currentNameSet) } ,*/ class:'thumbnailImage' , loading: 'lazy'}))
     }
     ownedImages = await fetchImages();
+    //console.log(ownedImages.data.length + "toto je dlzka owned images po append")
     //currentImages = ownedImages
-    for (var i = 0 ; i < ownedImages.data.length; i++) {
+    currentImages = []
+    console.log(ownedImages.data.length + " toto je current images data length")
+    console.log(currentNameSet.length + " toto je current nameset length")
+    for (let i = 0 ; i < ownedImages.data.length; i++) {
         for (var j = 0 ; j < currentNameSet.length; j++) {
             if(ownedImages.data[i]["originalName"] === currentNameSet[j]) {
                 currentImages.push(ownedImages.data[i])
+                console.log("pridavam")
+                console.log(ownedImages.data[i])
+                console.log(ownedImages)
+                console.log(currentImages)
+                console.log(currentNameSet.length + " dlzka current nameset")
+
             }
         }
     }
@@ -313,8 +338,8 @@ async function renderImages() {
     } else {
         albumImages = await fetchAlbumImages(currentAlbum)
         currentImages = albumImages.data
-        for (var i = 0 ; i < albumImages.data[0].length ; i++ ){
-            ownedImagesNames[i] = albumImages.data[0][i]['originalName']
+        for (var i = 0 ; i < albumImages.data.length ; i++ ){
+            ownedImagesNames[i] = albumImages.data[i]['originalName']
         }
         //var imageNames = images.data[0][]['originalname']
         currentNameSet = ownedImagesNames
@@ -327,13 +352,13 @@ async function renderImages() {
         if (i > 30) {
             /** for lazy loading */
             $('#photo-list').append('<div id=' + i + ' class="thumbnailDiv"><div class="thumbnailIcons" ><i class="far fa-check-circle fa-2x selectable"></i></div> </div>')
-            $('#' + i).append($('<img>',{ realsrc:'/photo/'+ ownedImagesNames[i], src:'', alt: '' , 'data-name': ownedImagesNames[i] , click:  function () { openWindow(this.dataset.name, ownedImagesNames) } , class:'thumbnailImage'}))
+            $('#' + i).append($('<img>',{ realsrc:'/photo/'+ ownedImagesNames[i], src:'', alt: '' , 'data-name': ownedImagesNames[i] ,/* click:  function () { openWindow(this.dataset.name, ownedImagesNames) } , */ class:'thumbnailImage'}))
             continue
         }
         var parent = i;
 
         $('#photo-list').append('<div id=' + i + ' class="thumbnailDiv"><div class="thumbnailIcons" ><i class="far fa-check-circle fa-2x selectable"></i></div> </div>')
-        $('#' + i).append( $('<img>',{ realsrc:'/photo/'+ ownedImagesNames[i], src:'/photo/'+ ownedImagesNames[i], alt: '' , 'data-name': ownedImagesNames[i] , click:  function () { openWindow(this.dataset.name, ownedImagesNames) } , class:'thumbnailImage'} ))
+        $('#' + i).append( $('<img>',{ realsrc:'/photo/'+ ownedImagesNames[i], src:'/photo/'+ ownedImagesNames[i], alt: '' , 'data-name': ownedImagesNames[i] ,/* click:  function () { openWindow(this.dataset.name, ownedImagesNames) }, */ class:'thumbnailImage'} ))
 
     }
     $('.thumbnailIcons').hide()
@@ -363,10 +388,15 @@ function sidebarResponsive() {
 }
 
 
-
+/**
+ * listener to make image fullscreen
+ */
 $(document).on('click', '.thumbnailImage', function () {
-
+    console.log($(this).data('name'))
+    var imageName = $(this).data('name')
+    openWindow(imageName, currentNameSet)
 })
+
 
 
 
@@ -741,10 +771,16 @@ $(document).on('click', '#addTagButton' , async function () {
     $('#forTags').html('')
     console.log(inpuTags + " toto su tags")
     reloadEditingTools()
+    await updateCurrentImages()
+
 
 })
 
 $(document).on('click', '#searchTagsButton', async function() {
+
+    console.log("teraz pridu current images ============================================================")
+    console.log(currentImages)
+
     console.log(tags + "a toto je dlzka " + tags.length)
     console.log(currentImages.length + " dlazka currentImages")
     if (tags.length > 0) {
@@ -803,6 +839,15 @@ $(document).on('click', '#searchTagsButton', async function() {
 
     }
 
+    //var  tempNameSet = currentNameSet
+    currentNameSet = []
+    for(i = 0 ; i < resultImages.length ; i ++) {
+        currentNameSet.push( resultImages[i]["originalName"])
+
+    }
+
+    ownedImages = fetchImages()
+
 })
 
 
@@ -812,4 +857,36 @@ $(document).on('click', '#searchTagsButton', async function() {
 
 $(document).on('click','#closeNavbar', function () {
     $('#editNavbar').hide()
+})
+
+
+
+async function updateCurrentImages() {
+    var tempImage
+    console.log(currentImages)
+    for (var i = 0; i < currentImages.length; i++) {
+       tempImage =  await getImageInfo(currentImages[i]["originalName"])
+        currentImages[i] = tempImage.data
+    }
+    console.log("current images po update ------------------------------------------------------")
+    console.log(currentImages)
+
+}
+
+
+$(document).on('click','#makePublicLi', async function () {
+    for (var i = 0 ; i < selected.length; i++) {
+        await makePublic(selected[i])
+    }
+    reloadEditingTools()
+
+})
+
+
+$(document).on('click','#makePrivateLi', async function () {
+    for (var i = 0 ; i < selected.length; i++) {
+        await makePrivate(selected[i])
+    }
+    reloadEditingTools()
+
 })

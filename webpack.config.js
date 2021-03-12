@@ -30,6 +30,7 @@ Encore
     .addEntry('app', './assets/app.js')
     .addEntry('vuePage', './assets/vuePage.js')
     .addEntry('mainPage', './assets/mainPage.js')
+    .addEntry('sharedPhotos', './assets/sharedPhotos.js')
     .addStyleEntry('login', './assets/styles/logn.css')
     .addStyleEntry('main', './assets/styles/main.css')
     .addStyleEntry('register', './assets/styles/register.css')

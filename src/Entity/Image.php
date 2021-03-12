@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ApiResource()
  * @ORM\Entity(repositoryClass=ImageRepository::class)
  */
-class Image
+class Image // implements \JsonSerializable
 {
     /**
      * @ORM\Id
@@ -33,19 +33,19 @@ class Image
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="images")
      * @ORM\JoinColumn(nullable=false)
-     *
+     *@Groups("share")
      */
     private $owner;
 
     /**
      * @ORM\Column(type="decimal", precision=15, scale=10, nullable=true)
-     * @Groups("image")
+     * @Groups({"image","share"})
      */
     private $latitude;
 
     /**
      * @ORM\Column(type="decimal", precision=15, scale=10, nullable=true)
-     * @Groups("image")
+     * @Groups({"image","share"})
      */
     private $longitude;
 
@@ -59,13 +59,13 @@ class Image
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups("image")
+     * @Groups({"image","share"})
      */
     private $UploadedAt;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("image")
+     * @Groups({"image","share"})
      */
     private $originalName;
 
@@ -79,6 +79,11 @@ class Image
      * @Groups("image")
      */
     private $tags;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $publishedAt;
 
     public function __construct()
     {
@@ -239,6 +244,29 @@ class Image
         if ($this->tags->removeElement($tag)) {
             $tag->removeImage($this);
         }
+
+        return $this;
+    }
+
+    /*public function jsonSerialize()
+    {
+        return [
+            'originalName' => $this->originalName,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'uploadedAt' => $this->UploadedAt,
+            'tags' => $this->tags
+        ];
+    }*/
+
+    public function getPublishedAt(): ?\DateTimeInterface
+    {
+        return $this->publishedAt;
+    }
+
+    public function setPublishedAt(?\DateTimeInterface $publishedAt): self
+    {
+        $this->publishedAt = $publishedAt;
 
         return $this;
     }

@@ -82,7 +82,7 @@ class AlbumController extends AbstractController
         $albums = $this->getUser()->getAlbums();
         foreach ($albums as $album) {
             if($album->getName() === $albumName) {
-                $albumImages[] = $album->getImage();
+                $albumImages = $album->getImage();
                 return $this->json($albumImages,200,[],[
                     'groups' => ['image']
                 ]);

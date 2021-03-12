@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Image;
 use App\Form\ImageUpdateType;
 use App\Repository\ImageRepository;
+use App\Service\SharingToggler;
 use App\Service\UploaderHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use ImagickException;
@@ -48,14 +49,19 @@ class ImageController extends AbstractController
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
+    /**
+     * @var SharingToggler
+     */
+    private SharingToggler $sharingToggler;
 
 
-    public function __construct(Security $security , ImageRepository $imageRepository ,  UploaderHelper $uploaderHelper, LoggerInterface $logger ) {
+    public function __construct(Security $security , ImageRepository $imageRepository , UploaderHelper $uploaderHelper, LoggerInterface $logger , SharingToggler $sharingToggler ) {
         $this->security = $security;
         $this->imageRepository = $imageRepository;
         $this->uploaderHelper = $uploaderHelper;
         $this->filenamesToRender = array();
         $this->logger = $logger;
+        $this->sharingToggler = $sharingToggler;
     }
 
 
@@ -275,5 +281,50 @@ class ImageController extends AbstractController
             'groups' => ['image']
         ]);
     }
+
+
+    /**
+     * @Route("/get/image/info/{filename}" , name="get_image_info" , methods={"GET"})
+     */
+    public function getimageInfo(string $filename, Request $request) {
+        /** @var Image $image */
+        $image = $this->imageRepository->findOneBy(['originalName' => $filename]);
+        if ($image->getOwner() === $this->security->getUser()) {
+            return $this->json($image, 200, [], [
+                'groups' => ['image']
+            ]);
+        } else {
+            return $this->json("Not authorized to delete some of the  files", 401);
+        }
+
+    }
+
+    /**
+     * @param string $filename
+     * @param Request $request
+     * @param bool $public
+     * @param EntityManagerInterface $entityManager
+     * @return JsonResponse
+     * @Route("/make/public/{filename}", name="make_public", methods={"POST"})
+     */
+    public function makePublic(string $filename ) {
+        if ($this->sharingToggler->toggleShare($filename,true)) {
+            return $this->json("photo is shared now", 201);
+        } else {
+            return $this->json("Not authorized to manipulate some of the  files", 401);
+        }
+    }
+
+    /**
+     * @Route("/make/private/{filename}" , name="make_private" , methods={"POST"})
+     */
+    public function makePrivate(string $filename, Request $request, EntityManagerInterface $entityManager) {
+        if ($this->sharingToggler->toggleShare($filename,false)) {
+            return $this->json("photo is private now", 201);
+        } else {
+            return $this->json("Not authorized to manipulate some of the  files", 401);
+        }
+    }
+
 
 }
