@@ -105,8 +105,9 @@ class ImageRepository extends ServiceEntityRepository
 
     public function getPublicImages() {
         return $this->createQueryBuilder('r')
-            ->select('r.originalName, r.latitude, r.longitude, r.UploadedAt , r.publishedAt, o.username')
+            ->select('r.originalName, r.latitude, r.longitude, r.UploadedAt , r.publishedAt  , o.username ')
             ->join('r.owner', 'o')
+            //->join('r.likes', 'l')
             ->andWhere('r.public = :val' )
             ->setParameter('val' , 1)
             //->orderBy($orderByColumn ?: 'r.UploadedAt', $direction ?: "ASC" )
@@ -117,6 +118,28 @@ class ImageRepository extends ServiceEntityRepository
     public function getPublicImages2() {
          $result = $this->findBy(['public' => 1]);
          return array($result);
+    }
+
+    public function getImageLikes($filename) {
+        return $this->createQueryBuilder('l')
+            ->select(' o.username')
+            ->join('l.likes', 'j')
+            ->join('l.owner', 'o')
+            ->andWhere('l.originalName = :val')
+            ->setParameter('val' , $filename)
+            ->getQuery()
+            ->getResult();
+
+    }
+
+    public function getLikedImages() {
+        return $this->createQueryBuilder('c')
+            ->select('c.originalName, c.latitude, c.longitude, c.UploadedAt , c.publishedAt')
+            ->join('c.users', 'u')
+            ->andWhere('u.username = :val')
+            ->setParameter('val', $this->security->getUser()->getUsername())
+            ->getQuery()
+            ->getResult();
     }
 
     // /**

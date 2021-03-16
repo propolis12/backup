@@ -94,12 +94,24 @@ class User  implements UserInterface  //, \JsonSerializable
      */
     private $albums;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Like::class, mappedBy="user", orphanRemoval=true)
+     */
+    private Collection $likes;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Image::class, inversedBy="users")
+     */
+    private $likedImages;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
         $this->friend = new ArrayCollection();
         $this->friends = new ArrayCollection();
         $this->albums = new ArrayCollection();
+        $this->likes = new ArrayCollection();
+        $this->likedImages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -333,4 +345,58 @@ class User  implements UserInterface  //, \JsonSerializable
             'username' => $this->username,
         ];
     }*/
+
+    /**
+     * @return Collection|Like[]
+     */
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(Like $like): self
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes[] = $like;
+            $like->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLike(Like $like): self
+    {
+        if ($this->likes->removeElement($like)) {
+            // set the owning side to null (unless already changed)
+            if ($like->getUser() === $this) {
+                $like->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Image[]
+     */
+    public function getLikedImages(): Collection
+    {
+        return $this->likedImages;
+    }
+
+    public function addLikedImage(Image $likedImage): self
+    {
+        if (!$this->likedImages->contains($likedImage)) {
+            $this->likedImages[] = $likedImage;
+        }
+
+        return $this;
+    }
+
+    public function removeLikedImage(Image $likedImage): self
+    {
+        $this->likedImages->removeElement($likedImage);
+
+        return $this;
+    }
 }

@@ -366,10 +366,13 @@ margin-top: 5px;
 }
 
 .thumbnailIconsShared {
-    position: absolute;
+    /*position: absolute;
     bottom: 5%;
     right: 5%;
-    z-index: 999;
+    z-index: 999;*/
+    display: flex;
+    justify-content: end;
+    margin-right: 10px;
 }
 
 .thumbnailDiv .thumbnailIcons:hover {
@@ -574,9 +577,7 @@ input {
 
 }
 
-.fa-heart {
-    color: wheat;
-}
+
 
 .ownerNameDiv {
     margin-left: 5px;
@@ -585,4 +586,13 @@ input {
 .publicInfoDiv {
     display: flex;
     justify-content: center;
+}
+
+.numberLikes {
+    font-size: large;
+    /*color: wheat;*/
+}
+
+.likeable {
+    padding-top: 5px;
 }

@@ -85,10 +85,23 @@ class Image // implements \JsonSerializable
      */
     private $publishedAt;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Like::class, mappedBy="image", orphanRemoval=true)
+     * @Groups("share")
+     */
+    private Collection $likes;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, mappedBy="likedImages")
+     */
+    private Collection $users;
+
     public function __construct()
     {
         $this->albums = new ArrayCollection();
         $this->tags = new ArrayCollection();
+        $this->likes = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
 
@@ -267,6 +280,63 @@ class Image // implements \JsonSerializable
     public function setPublishedAt(?\DateTimeInterface $publishedAt): self
     {
         $this->publishedAt = $publishedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Like[]
+     */
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(Like $like): self
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes[] = $like;
+            $like->setImage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLike(Like $like): self
+    {
+        if ($this->likes->removeElement($like)) {
+            // set the owning side to null (unless already changed)
+            if ($like->getImage() === $this) {
+                $like->setImage(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addLikedImage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeLikedImage($this);
+        }
 
         return $this;
     }

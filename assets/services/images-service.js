@@ -38,3 +38,15 @@ export function makePrivate(filename) {
 export function fetchPublicImages() {
     return axios.get('/get/public/images')
 }
+
+export function likePhoto(filename) {
+    return axios.post('/like/photo/' + filename)
+}
+
+export function fetchLikedImages() {
+    return axios.get('/get/liked/images')
+}
+
+export function unlikePhoto(filename) {
+    return axios.post('/unlike/photo/' + filename)
+}
