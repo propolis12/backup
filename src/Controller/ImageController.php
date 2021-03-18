@@ -6,6 +6,7 @@ use App\Entity\Image;
 use App\Form\ImageUpdateType;
 use App\Repository\ImageRepository;
 use App\Service\SharingToggler;
+use App\Service\ThumbnailProvider;
 use App\Service\UploaderHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use ImagickException;
@@ -15,14 +16,17 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Mime\MimeTypes;
 
 class ImageController extends AbstractController
 {
@@ -53,15 +57,21 @@ class ImageController extends AbstractController
      * @var SharingToggler
      */
     private SharingToggler $sharingToggler;
+    /**
+     * @var ThumbnailProvider
+     */
+    private ThumbnailProvider $thumbnailProvider;
 
 
-    public function __construct(Security $security , ImageRepository $imageRepository , UploaderHelper $uploaderHelper, LoggerInterface $logger , SharingToggler $sharingToggler ) {
+    public function __construct(Security $security , ImageRepository $imageRepository , UploaderHelper $uploaderHelper, LoggerInterface $logger , SharingToggler $sharingToggler,
+                                ThumbnailProvider $thumbnailProvider) {
         $this->security = $security;
         $this->imageRepository = $imageRepository;
         $this->uploaderHelper = $uploaderHelper;
         $this->filenamesToRender = array();
         $this->logger = $logger;
         $this->sharingToggler = $sharingToggler;
+        $this->thumbnailProvider = $thumbnailProvider;
     }
 
 
@@ -119,15 +129,38 @@ class ImageController extends AbstractController
     public function thumbnailImage(Request $request, string $filename) {
         $image = $this->imageRepository->findOneBy(['originalName' => $filename]);
         if ($image->getOwner() === $this->security->getUser()) {
-            $publicName = $this->uploaderHelper->getFullPath($filename);
+            $this->thumbnailProvider->provideThumbnail($filename,300,200);
+            /*$publicName = $this->uploaderHelper->getFullPath($filename);
             $imagick = new \Imagick($publicName);
             $imagick->setbackgroundcolor('rgb(64, 64, 64)');
             $imagick->thumbnailImage(300, 200, false, false);
             header("Content-Type: image/jpg");
             /*$response = new BinaryFileResponse($imagick->getFilename());
             return $response;*/
-            echo $imagick->getImageBlob();
+            /*echo $imagick->getImageBlob();*/
         }
+    }
+
+
+    /**
+     * @Route("/public/photo/{filename}", name="send_public_thumbnail", methods={"GET"} )
+     *
+     * @param string $filename
+     * @throws ImagickException
+     */
+
+    public function thumbnailPublicImage(string $filename) {
+        $image = $this->imageRepository->findOneBy(['originalName' => $filename]);
+
+            $this->thumbnailProvider->provideThumbnail($filename,300,200);
+            /*$publicName = $this->uploaderHelper->getFullPath($filename);
+            $imagick = new \Imagick($publicName);
+            $imagick->setbackgroundcolor('rgb(64, 64, 64)');
+            $imagick->thumbnailImage(300, 200, false, false);
+            header("Content-Type: image/jpg");
+            /*$response = new BinaryFileResponse($imagick->getFilename());
+            return $response;*/
+            /*echo $imagick->getImageBlob();*/
     }
 
     /**
@@ -179,12 +212,15 @@ class ImageController extends AbstractController
         /** @var Image $image */
         $image = new Image();
         $newFilename = $uploaderHelper->uploadFile($uploadedFile);
+        $mimeTypes = new MimeTypes();
+        $mimeType = $mimeTypes->guessMimeType( $uploaderHelper->getFullPath($uploadedFile->getClientOriginalName()));
          array_push($this->filenamesToRender, $newFilename);
         $image->setPublic(false);
+        $image->setMimetype($mimeType);
         $image->setFilename($newFilename);
         $image->setOwner($security->getUser());
         $image->setUploadedAt(new \DateTimeImmutable("now"));
-        $originalFilename= $uploadedFile->getClientOriginalName();
+        $originalFilename = $uploadedFile->getClientOriginalName();
         $clientNameExtension = pathinfo($originalFilename, PATHINFO_EXTENSION);
         if ($uploadedFile->guessExtension() === 'jpg' || $uploadedFile->guessExtension() === 'png' || $uploadedFile->guessExtension() === 'gif') {
             $newFilename = $originalFilename;
@@ -244,7 +280,11 @@ class ImageController extends AbstractController
     {
         /** @var Image $image */
         $image = $this->imageRepository->findOneBy(['originalName' => $filename]);
-
+        if($image->getPublic()) {
+            $imagePath = $this->uploaderHelper->getFullPath($image->getOriginalName());
+            $response = new BinaryFileResponse($imagePath);
+            return $response;
+        }
         if ($image->getOwner() === $this->security->getUser()) {
             $imagePath = $this->uploaderHelper->getFullPath($image->getOriginalName());
             $response = new BinaryFileResponse($imagePath);
@@ -264,6 +304,7 @@ class ImageController extends AbstractController
         if($image->getOwner() === $this->security->getUser()) {
             $entityManager->remove($image);
             $entityManager->flush();
+            $this->uploaderHelper->deleteFromSystem($filename);
             return $this->json($filename . " was deleted ", 204);
 
         }
@@ -324,6 +365,31 @@ class ImageController extends AbstractController
         } else {
             return $this->json("Not authorized to manipulate some of the  files", 401);
         }
+    }
+
+
+    /**
+     * @Route("/download/image/{filename}" , name="download_image" , methods={"GET"})
+     */
+    public function downloadImage(string $filename) {
+        /** @var Image $image */
+        $image = $this->imageRepository->findOneBy(['originalName' => $filename]);
+        if ($image->getOwner() === $this->security->getUser()) {
+                $response = new StreamedResponse(function() use ($filename) {
+                $outputStream = fopen('php://output', 'wb');
+                $filestream = $this->uploaderHelper->readStream($filename);
+                stream_copy_to_stream($filestream , $outputStream);
+            });
+            $response->headers->set('Content-Type' , $image->getMimetype());
+            $disposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_ATTACHMENT,
+            $image->getFilename()
+            );
+            //dd($disposition);
+            $response->headers->set('Content-Disposition', $disposition);
+            return $response;
+        }
+        return $this->json("Not authorized to delete this file ", 401);
     }
 
 

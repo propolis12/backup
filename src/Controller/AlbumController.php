@@ -31,27 +31,32 @@ class AlbumController extends AbstractController
      * @var ImageRepository
      */
     private ImageRepository $imageRepository;
+    /**
+     * @var EntityManagerInterface
+     */
+    private EntityManagerInterface $entityManager;
 
-    public function __construct( Security $security , AlbumRepository $albumRepository , ImageRepository $imageRepository)
+    public function __construct( Security $security , AlbumRepository $albumRepository , ImageRepository $imageRepository , EntityManagerInterface $entityManager)
     {
 
 
         $this->security = $security;
         $this->albumRepository = $albumRepository;
         $this->imageRepository = $imageRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
      *@Route("/album/create", name="album_create", methods={"POST"})
      */
-    public function create(Request $request, EntityManagerInterface $entityManager) {
+    public function create(Request $request) {
         $albumName = json_decode($request->getContent(),true);
         $album = new Album();
         $album->setOwner($this->security->getUser());
         $album->setName($albumName['albumName']);
         try {
-            $entityManager->persist($album);
-            $entityManager->flush();
+            $this->entityManager->persist($album);
+            $this->entityManager->flush();
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
             return $this->json($errorMessage, 500);
@@ -94,7 +99,7 @@ class AlbumController extends AbstractController
     /**
      * @Route("/add/to/album/{albumName}", name="add_to_album" , methods={"POST"})
      */
-    public function addToAlbum(string $albumName, Request $request , EntityManagerInterface $entityManager) {
+    public function addToAlbum(string $albumName, Request $request) {
 
         $data = json_decode($request->getContent(),true);
         /** @var Image $image */
@@ -104,8 +109,8 @@ class AlbumController extends AbstractController
         if (($this->security->getUser() === $image->getOwner()) && ($this->security->getUser() === $image->getOwner())) {
 
             if ($album->addImage($image)) {
-                $entityManager->persist($album);
-                $entityManager->flush();
+                $this->entityManager->persist($album);
+                $this->entityManager->flush();
 
                 return $this->json($data["filename"] . "successfully added ", 201);
             }
@@ -115,7 +120,7 @@ class AlbumController extends AbstractController
     }/**
      * @Route("/remove/from/album/{albumName}", name="remove_from_album" , methods={"POST"})
      */
-    public function removeFromAlbum(string $albumName, Request $request , EntityManagerInterface $entityManager) {
+    public function removeFromAlbum(string $albumName, Request $request ) {
 
         $data = json_decode($request->getContent(),true);
         /** @var Image $image */
@@ -127,13 +132,32 @@ class AlbumController extends AbstractController
             foreach ($album->getImage() as $currentImage) {
                 if ($currentImage->getOriginalName() === $image->getOriginalName())  {
                     $album->removeImage($currentImage);
-                    $entityManager->persist($album);
-                    $entityManager->flush();
+                    $this->entityManager->persist($album);
+                    $this->entityManager->flush();
                     return $this->json($data["filename"]. "was deleted from album " . $album->getName(), 200);
                 }
             }
         }
         return $this->json("operation was not successful",500);
+
+    }
+
+
+    /**
+     * @param string $name
+     * @Route("/delete/album/{name}" , name="delete_album" , methods={"DELETE"})
+     */
+    public function deleteAlbum(string $name) {
+        $album = $this->albumRepository->findOneBy(['name' => $name]);
+        if ($this->security->getUser() === $album->getOwner()) {
+            $this->security->getUser()->removeAlbum($album);
+            $this->entityManager->persist($this->security->getUser());
+            $this->entityManager->flush();
+            return $this->json("deleted successfully",204);
+        }
+        return $this->json("not authorized to delete this album" , 401);
+
+
 
     }
 }

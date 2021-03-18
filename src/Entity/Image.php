@@ -96,6 +96,11 @@ class Image // implements \JsonSerializable
      */
     private Collection $users;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $mimetype;
+
     public function __construct()
     {
         $this->albums = new ArrayCollection();
@@ -337,6 +342,18 @@ class Image // implements \JsonSerializable
         if ($this->users->removeElement($user)) {
             $user->removeLikedImage($this);
         }
+
+        return $this;
+    }
+
+    public function getMimetype(): ?string
+    {
+        return $this->mimetype;
+    }
+
+    public function setMimetype(string $mimetype): self
+    {
+        $this->mimetype = $mimetype;
 
         return $this;
     }

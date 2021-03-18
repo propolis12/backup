@@ -42,3 +42,7 @@ export async function deleteOnlyFromAlbum(albumName , filename) {
             }
         });
 }
+
+export async function deleteAlbum(name) {
+    return await axios.delete('/delete/album/' + name)
+}

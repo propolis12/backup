@@ -10,11 +10,12 @@ import {
 import './bootstrap';
 import $ from 'jquery';
 import {fetchAlbumImages} from "@/services/album-services";
-import {setHoveringOverImages} from "@/mainPage";
+import {openWindow, setHoveringOverImages,nextImage,findCurrentImage,previousImage,closeImage} from "@/mainPage";
 //require('bootstrap')
 
 var publicImages = []
 var likedImages = []
+var publicImagesNames = []
 $(document).ready(async function() {
     $('#uploadIcon').remove()
     console.log("asdafsfsdfsdfsdfsfsdfsdfsdf")
@@ -22,9 +23,12 @@ $(document).ready(async function() {
     likedImages = await fetchLikedImages()
     console.log(publicImages)
     console.log("toto budu moje liked images")
-    console.log(likedImages.data)
+    console.log(likedImages)
     await renderImagesShared()
     $('#photo-list').html('')
+    for (var i = 0; i < publicImages.data.length; i++) {
+        publicImagesNames[i] = publicImages.data[i]['originalName']
+    }
 })
 
 
@@ -34,70 +38,57 @@ async function renderImagesShared() {
 
 
     $('#photoListShared').html('');
-    var publicImagesNames = []
     var iconClass = 'far'
-        publicImages = await fetchPublicImages();
-        for (var i = 0 ; i  < publicImages.data.length; i++) {
-            publicImagesNames[i] = publicImages.data[i]['originalName']
-        }
+    publicImages = await fetchPublicImages();
+
 
     // ownedImages = await fetchOwnedImages();
 
     console.log(publicImagesNames + "toto je ownedImages");
-    for(var i = 0 ; i < publicImages.data.length ; i++) {
+    for (var i = 0; i < publicImages.data.length; i++) {
 
+
+        /** for lazy loading */
+        renderHelp(i)
         if (i > 30) {
-            /** for lazy loading */
-            $('#photoListShared').append('<div id=' + i + 'shared' + ' class="thumbnailDivShared"><div class="thumbnailIconsShared" ><span class="numberLikes">3</span><i class="far fa-heart  likeable"></i></div> </div>')
-            if (publicImages.data[i]['publishedAt'] !== null) {
-                $('#' + i + 'shared').append('<div class="publicInfoDiv"><div class="ownerNameDiv">'+ publicImages.data[i]['username']  + '</div><div class="publishDateDiv">'+ timeSince(new Date( (publicImages.data[i]['publishedAt'])))  + '</div></div>')
-            } else {
-                $('#' + i + 'shared').append('<div class="publicInfoDiv"><div class="ownerNameDiv">'+ publicImages.data[i]['username']  + '</div></div>')
-            }
-
-            $('#' + i + 'shared').append($('<img>',{ realsrc:'/photo/'+  publicImages.data[i]['originalName'], src:'', alt: '' , 'data-name':  publicImages.data[i]['originalName'] , class:'thumbnailImageShared'}))
-
-
-                for (var l = 0 ; l < likedImages.data.length; l++) {
-                    if (likedImages.data[l] === publicImages.data[j]["originalName"]) {
-                        iconClass = 'fas'
-                        break;
-                    }
-                }
-
-            $('#' + i + 'shared').append('<div class="thumbnailIconsShared" ><span class="numberLikes mr-2">' + publicImages.data[i]['likes'].length + '</span><i class="'+ iconClass + 'fa-heart  likeable" ></i></div>')
-            iconClass = 'far'
-            continue
-        }
-
-        $('#photoListShared').append('<div id=' + i + 'shared' + ' class="thumbnailDivShared"> </div>')
-        if (publicImages.data[i]['publishedAt'] !== null) {
-            $('#' + i + 'shared').append('<div class="publicInfoDiv"><div class="ownerNameDiv">'+ publicImages.data[i]['username']  + '</div><div class="publishDateDiv">'+ timeSince(new Date( (publicImages.data[i]['publishedAt'])))  + '</div></div>')
+            $('#' + i + 'shared').append($('<img>', {
+                realsrc: '/public/photo/' + publicImages.data[i]['originalName'],
+                src: '',
+                alt: '',
+                'data-name': publicImages.data[i]['originalName'],
+                class: 'thumbnailImageShared'
+            }))
         } else {
-            $('#' + i + 'shared').append('<div class="publicInfoDiv"><div class="ownerNameDiv">'+ publicImages.data[i]['username']  + '</div></div>')
+            $('#' + i + 'shared').append($('<img>', {
+                realsrc: '/public/photo/' + publicImages.data[i]['originalName'],
+                src: '/public/photo/' + publicImages.data[i]['originalName'],
+                alt: '',
+                'data-name': publicImages.data[i]['originalName'],
+                class: 'thumbnailImageShared'
+            }))
+        }
+        for (var l = 0; l < likedImages.data.length; l++) {
+            if (likedImages.data[l]["originalName"] === publicImages.data[i]["originalName"]) {
+                iconClass = 'fas'
+                break
+            }
         }
 
-        $('#' + i + 'shared').append( $('<img>',{ realsrc:'/photo/'+  publicImages.data[i]['originalName'], src:'/photo/'+  publicImages.data[i]['originalName'], alt: '' , 'data-name': publicImages.data[i]['originalName'], class:'thumbnailImageShared'} ))
-        console.log("----------------------------------------------------------------------------")
-            console.log(likedImages.data.length)
-            for (var l = 0 ; l < likedImages.data.length; l++) {
-                //console.log(likedImages[l]["originalName"])
-                //console.log(likedImages[l]["originalName"]+ '  ' + publicImages.data[j]["originalName"])
-                if (likedImages.data[l]["originalName"] === publicImages.data[i]["originalName"]) {
-                    iconClass = 'fas'
-                    console.log("zhoda")
-                    break
-                }
-            }
-
-        $('#' + i + 'shared').append('<div class="thumbnailIconsShared" ><span class="numberLikes mr-2">' + publicImages.data[i]['likes'].length + '</span><i class="'+ iconClass + ' fa-heart  likeable"></i></div>')
+        $('#' + i + 'shared').append('<div class="thumbnailIconsShared" ><span class="numberLikes mr-2">' + publicImages.data[i]['likes'].length + '</span><i class="' + iconClass + ' fa-heart  likeable" ></i></div>')
         iconClass = 'far'
+
     }
-    $('.thumbnailIcons').hide()
-    //setHoveringOverImages()
 }
 
 
+function renderHelp(i) {
+    $('#photoListShared').append('<div id=' + i + 'shared' + ' class="thumbnailDivShared"> </div>')
+    if (publicImages.data[i]['publishedAt'] !== null) {
+        $('#' + i + 'shared').append('<div class="publicInfoDiv"><div class="ownerNameDiv">'+ publicImages.data[i]['username']  + '</div><div class="publishDateDiv">'+ timeSince(new Date( (publicImages.data[i]['publishedAt'])))  + '</div></div>')
+    } else {
+        $('#' + i + 'shared').append('<div class="publicInfoDiv"><div class="ownerNameDiv">'+ publicImages.data[i]['username']  + '</div></div>')
+    }
+}
 
 
 function timeSince(date) {
@@ -135,9 +126,9 @@ $(document).on('click','.likeable', async function () {
     var image
     var name = $(this).parent().siblings()[1].dataset.name
     //console.log(name)
-    console.log(likedImages)
+    console.log(likedImages.data.length)
     for (i = 0 ; i < likedImages.data.length; i++) {
-        //console.log(likedImages.data[i]["originalName"])
+        console.log(likedImages.data[i]["originalName"] + "asdafsssssssssssasfaaaaasfdsssssssssssssssssssssssssff")
         if (likedImages.data[i]["originalName"] === name) {
             liked = true
         }
@@ -156,6 +147,8 @@ $(document).on('click','.likeable', async function () {
         //console.log("likedImages po delete ")
         //console.log(likedImages)
         toggleLikedHeart()
+
+
     }
 
 
@@ -183,5 +176,9 @@ function toggleLikedHeart() {
 }
 
 $(document).on('click', '.thumbnailImageShared' , async  function () {
+        console.log($(this).data('name'))
+        var imageName = $(this).data('name')
+        openWindow(imageName, publicImagesNames)
+        $('#fullscreenPicture').prepend('<div></div>')
 
 })

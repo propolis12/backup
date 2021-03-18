@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Image;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemInterface;
+use mysql_xdevapi\Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -113,5 +114,23 @@ class UploaderHelper
     public function getFullPath(string $filename): string
     {
          return $this->kernel->getProjectDir().UploaderHelper::IMAGE_DIRECTORY.'/'.$filename;
+    }
+
+    public function deleteFromSystem(string $filename) {
+
+            $this->filesystem->delete($filename);
+
+    }
+
+    /**
+     * @param string $filename
+     * @return resource
+     */
+    public function readStream(string $filename) {
+        $resource = $this->filesystem->readStream($filename);
+        if ($resource === false) {
+            throw new \Exception(sprintf('Error opening stream for "%s"', $filename));
+        }
+        return $resource;
     }
 }

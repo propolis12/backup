@@ -7,9 +7,16 @@ import {
     deleteImage,
     fetchImages,
     getImageInfo,
-    makePublic, makePrivate
+    makePublic, makePrivate, downloadImage
 } from "@/services/images-service";
-import {postAlbum, fetchAlbums, fetchAlbumImages, addToAlbum, deleteOnlyFromAlbum} from "@/services/album-services";
+import {
+    postAlbum,
+    fetchAlbums,
+    fetchAlbumImages,
+    addToAlbum,
+    deleteOnlyFromAlbum,
+    deleteAlbum
+} from "@/services/album-services";
 import './bootstrap';
 import './styles/mainPage.css';
 import dropzone from "dropzone";
@@ -45,7 +52,9 @@ var currentImages = []
 
 $(document).ready(async function() {
     //console.log(tags + "sdasfafadfsadfsadfsafsafsdfsfsdfsdfsdfscscscsdcs")
+    $('#albumList').hide()
     myImages  = await fetchImages();
+
     //console.log(myImages.data[6]["tags"][0]["name"]);
     $('#addTagLi').hide()
     $('#deleteOnlyFromAlbumLi').hide()
@@ -131,14 +140,6 @@ $(document).on('click', '.addToAlbumClickableLi', async function () {
 
 
 
-$(document).on('click', '.fa-trash', async function () {
-    console.log("klikol som")
-    console.log($(this).parent().siblings().data()["name"])
-    let imageName = $(this).parent().siblings().data()["name"]
-    let response = await deleteImage(imageName)
-    renderImages().then(r => {
-    });
-})
 
 
 
@@ -291,12 +292,14 @@ async function appendImage(names) {
     }
     currentNameSet.push(names)*/
     currentNameSet = currentNameSet.concat(names)
-    console.log(currentNameSet)
+    var tempLength = names.length
+    console.log(currentNameSet.length)
+    console.log(names.length + "toto je current nameSet dlzka -----------------------------------------")
     //console.log(currentNameSet.length + " toto je dlzka namesetu po ")
     for(let i = 0; i < names.length; i++) {
    // console.log(names[i]);
-    $('#photo-list').append('<div id=' + (currentNameSet.length)  + '  class="thumbnailDiv" ><div class="thumbnailIcons" ><i class="far fa-check-circle fa-2x selectable"></i></div></div>')
-    $('#' + (currentNameSet.length + i)).append($('<img>',{src:'/photo/'+ names[i], alt: '' ,'data-name': names[i] , /*click:  function () { openWindow(this.dataset.name, currentNameSet) } ,*/ class:'thumbnailImage' , loading: 'lazy'}))
+    $('#photo-list').append('<div id=' + (currentNameSet.length - tempLength + i)  + '  class="thumbnailDiv" ><div class="thumbnailIcons" ><i class="far fa-check-circle fa-2x selectable"></i></div></div>')
+    $('#' + (currentNameSet.length - tempLength + i)).append($('<img>',{src:'/photo/'+ names[i], alt: '' ,'data-name': names[i] , /*click:  function () { openWindow(this.dataset.name, currentNameSet) } ,*/ class:'thumbnailImage' , loading: 'lazy'}))
     }
     ownedImages = await fetchImages();
     //console.log(ownedImages.data.length + "toto je dlzka owned images po append")
@@ -405,11 +408,11 @@ $(document).on('click', '.thumbnailImage', function () {
  *  name - url of the image from source attribute
  * number - position of actual name in name(url) parameter
  * we want extract only the name , because the name(url) is not a good response for this request */
-function openWindow(name, nameSet) {
+ export function openWindow(name, nameSet) {
     currentNameSet = nameSet
     //console.log(name + " toto je manommsddfsffsdf");
     //var name = name.substr(number)
-    $('#insertPicture').html($('<img>',{src:'send/fullPhoto/'+ name, alt: '' , id: 'fullScreenImage'}));
+    $('#insertPicture').html($('<img>',{src:'/send/fullPhoto/'+ name, alt: '' , id: 'fullScreenImage'}));
     $('#fullscreenPicture').show();
     $('#photo-list').hide();
     findCurrentImage(name, nameSet);
@@ -418,14 +421,14 @@ function openWindow(name, nameSet) {
 
 }
 
-function closeImage() {
+export function closeImage() {
     console.log("blaaaaaaaaaaaaaaaaa");
     $('#fullscreenPicture').hide();
     $('#photo-list').show();
 }
 
 
-function findCurrentImage(name , nameSet) {
+export function findCurrentImage(name , nameSet) {
     console.log(name + " toto je meno image");
 
     for(var i = 0; i < nameSet.length; i++) {
@@ -439,12 +442,12 @@ function findCurrentImage(name , nameSet) {
     }
 
 }
-function previousImage() {
+ export function previousImage() {
     console.log(currentImageIndex + " teraz je toto index")
     if(currentImageIndex !== 0) {
         currentImageIndex--;
         $('#insertPicture').html($('<img>', {
-            src: 'send/fullPhoto/' + currentNameSet[currentImageIndex],
+            src: '/send/fullPhoto/' + currentNameSet[currentImageIndex],
             alt: 'photo',
             id: 'fullScreenImage'
         }));
@@ -454,10 +457,10 @@ function previousImage() {
 
 }
 
-function nextImage() {
+export function nextImage() {
     if(currentImageIndex !== (currentNameSet.length - 1)) {
         currentImageIndex++;
-        $('#insertPicture').html($('<img>',{src:'send/fullPhoto/'+ currentNameSet[currentImageIndex], alt: '' , id: 'fullScreenImage'}));
+        $('#insertPicture').html($('<img>',{src:'/send/fullPhoto/'+ currentNameSet[currentImageIndex], alt: '' , id: 'fullScreenImage'}));
         console.log(currentImageIndex + "index po kliknuti");
     }
 }
@@ -555,10 +558,11 @@ $(document).on('click',"a.AlbumListItem" , async function () {
 
 
 async function loadAlbums() {
+    $('#albumList').html('')
     albums = await fetchAlbums();
     for (var i = 0; i < albums.data.length; i++) {
         console.log(albums.data[i]["name"])
-        $('#homeSubmenu').append('<li class="albumListItem"><a class="AlbumListItem" data-AlbumName="' + albums.data[i]["name"] + '"> ' + albums.data[i]["name"] + '</a></li>')
+        $('#albumList').append('<li class="albumListItem"><a class="AlbumListItem" data-AlbumName="' + albums.data[i]["name"] + '"> ' + albums.data[i]["name"] + '<i class="fas fa-trash deleteAlbumIcon"></i></a></li>')
 
     }
 
@@ -889,4 +893,27 @@ $(document).on('click','#makePrivateLi', async function () {
     }
     reloadEditingTools()
 
+})
+
+$(document).on('click', '.deleteAlbumIcon', async function (event) {
+    event.stopImmediatePropagation();
+    var name = $(this).parent().data('albumname')
+    var response = await  deleteAlbum(name)
+    if (response.status !== 401 ) {
+        $(this).parent().parent().remove()
+    }
+    //$('#photo-list').html('')
+    $('#loadAllImagesLi').click()
+
+})
+
+$(document).on('click', '#albumListToggler', function () {
+    $('#albumList').toggle()
+})
+
+
+$(document).on('click', '#downloadImagesNav' , async function () {
+    for (var i = 0 ; i < selected.length ; i++ ) {
+        await downloadImage(selected[i])
+    }
 })

@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -17,9 +18,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
+
+    /**
+     * @var Security
+     */
+    private Security $security;
+
+    public function __construct(ManagerRegistry $registry, Security $security)
     {
-        parent::__construct($registry, User::class);
+        parent::__construct($registry, User::class );
+        $this->security = $security;
     }
 
     /**
@@ -38,10 +46,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function getLikedImages() {
         return $this->createQueryBuilder('c')
-            ->select('u.originalName')
-            ->join('c.likedImages', 'u')
-            //->andWhere('u.username = :val')
-           // ->setParameter('val', $this->security->getUser()->getUsername())
+            ->select('i.originalName')
+            ->join('c.likes', 'u')
+            ->join('u.image' , 'i')
+            ->andWhere('u.user = :val')
+            ->setParameter('val', $this->security->getUser())
             ->getQuery()
             ->getResult();
     }

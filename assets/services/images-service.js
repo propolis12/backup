@@ -50,3 +50,7 @@ export function fetchLikedImages() {
 export function unlikePhoto(filename) {
     return axios.post('/unlike/photo/' + filename)
 }
+
+export function downloadImage(filename) {
+    return axios.get('/download/image/' + filename)
+}
